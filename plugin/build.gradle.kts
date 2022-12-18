@@ -78,8 +78,7 @@ tasks {
     }
 
     compileJava {
-        targetCompatibility = "8"
-        sourceCompatibility = "8"
+        options.release.set(17)
     }
 
     processResources {
