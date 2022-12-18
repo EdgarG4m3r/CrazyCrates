@@ -56,3 +56,40 @@ dependencies {
         exclude(group = "org.bukkit")
     }
 }
+
+val buildNumber: String? = System.getenv("BUILD_NUMBER")
+val buildVersion = "${project.version}-b$buildNumber-SNAPSHOT"
+
+tasks {
+    shadowJar {
+        if (buildNumber != null) {
+            archiveFileName.set("${rootProject.name}-${buildVersion}.jar")
+        } else {
+            archiveFileName.set("${rootProject.name}-${rootProject.version}.jar")
+        }
+
+        listOf(
+            "de.tr7zw",
+            "org.bstats",
+            "org.jetbrains"
+        ).forEach {
+            relocate(it, "${rootProject.group}.plugin.lib.$it")
+        }
+    }
+
+    compileJava {
+        targetCompatibility = "8"
+        sourceCompatibility = "8"
+    }
+
+    processResources {
+        filesMatching("plugin.yml") {
+            expand(
+                "name" to rootProject.name,
+                "group" to rootProject.group,
+                "version" to if (buildNumber != null) buildVersion else rootProject.version,
+                "description" to rootProject.description
+            )
+        }
+    }
+}

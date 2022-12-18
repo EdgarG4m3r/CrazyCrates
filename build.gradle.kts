@@ -2,8 +2,9 @@ plugins {
     `java-library`
 }
 
-project.group = "me.badbones69.crazycrates"
-project.version = "${extra["plugin_version"]}"
+rootProject.group = "me.badbones69.crazycrates"
+rootProject.version = "${extra["plugin_version"]}"
+rootProject.description = "Add unlimited crates to your server with 10 different crate types to choose from!"
 
 allprojects {
     apply(plugin = "java-library")
