@@ -58,7 +58,7 @@ dependencies {
 }
 
 val buildNumber: String? = System.getenv("BUILD_NUMBER")
-val buildVersion = "${project.version}-b$buildNumber-SNAPSHOT"
+val buildVersion = "${rootProject.version}-b$buildNumber-SNAPSHOT"
 
 tasks {
     shadowJar {

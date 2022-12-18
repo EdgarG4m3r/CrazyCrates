@@ -6,7 +6,7 @@ api-version: 1.13
 
 softdepend: [HolographicDisplays, Holograms, DecentHolograms, MVdWPlaceholderAPI, PlaceholderAPI]
 description: ${description}
-  
+
 commands:
   crazycrates:
     description: Opens the GUI.
