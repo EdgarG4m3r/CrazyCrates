@@ -41,7 +41,10 @@ dependencies {
 
     compileOnly("com.github.decentsoftware-eu", "decentholograms", "2.7.8")
 
-    compileOnly("be.maximvdw", "MVdWPlaceholderAPI", "3.1.1-SNAPSHOT")
+    compileOnly("be.maximvdw", "MVdWPlaceholderAPI", "3.1.1-SNAPSHOT") {
+        exclude(group = "org.spigotmc")
+        exclude(group = "org.bukkit")
+    }
 
     compileOnly("com.sainttx.holograms", "holograms", "2.12")
 
