@@ -1,17 +1,12 @@
-#Maven
-**/target
-dependency-reduced-pom.xml
-
-#IntelliJ
+.gradle
 .idea
-*.iml
-crazycrates/META-INF/
 
-#Eclipse
-**.settings
-**.classpath
-**.project
+build
 
-\.DS_Store
-
-src/main/lib/
+api/build
+plugin/build
+v1_8_R3/build
+v1_12_R1/build
+v1_16_R3/build
+v1_17_R1/build
+v1_18_R2/build
