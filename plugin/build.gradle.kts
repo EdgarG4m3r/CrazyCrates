@@ -34,6 +34,7 @@ dependencies {
     implementation("de.tr7zw", "nbt-data-api", "2.11.1")
 
     implementation("org.bstats", "bstats-bukkit", "3.0.0")
+    implementation("org.jetbrains", "annotations", "23.0.0")
 
     compileOnly("org.spigotmc", "spigot-api", "${project.extra["minecraft_version"]}-R0.1-SNAPSHOT")
 
