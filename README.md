@@ -1,26 +1,26 @@
 # Crazy Crates
-Source Code for Crazy Crates
-
-## Build Status:
-[![Build Status](https://jenkins.badbones69.com/view/Legacy/job/Crazy-Crates-Legacy/badge/icon)](https://jenkins.badbones69.com/view/Legacy/job/Crazy-Crates-Legacy/)
+The legacy source for CrazyCrates ( 1.8 -> 1.18.2 )
 
 ## Jenkins: 
-https://jenkins.badbones69.com/view/Legacy/job/Crazy-Crates-Legacy/
+https://ci.crazycrew.us/view/Legacy/job/CrazyCrates-Legacy/
+
+### Build Status:
+[![Build Status](https://ci.crazycrew.us/view/Legacy/job/CrazyCrates-Legacy/badge/icon)](https://ci.crazycrew.us/view/Legacy/job/CrazyCrates-Legacy/)
 
 ## Repo:
-N/A
+https://repo.crazycrew.us/#/legacy
 
 ## Maven:
 ```xml
 <repository>
-    <id>crazycrew-repo-legacy</id>
-    <name>CrazyCrew Team</name>
-    <url>https://repo.badbones69.com/legacy</url>
+    <id>crazycrew-legacy</id>
+    <url>https://repo.crazycrew.us/legacy</url>
 </repository>
 
 <dependency>
     <groupId>com.badbones69</groupId>
     <artifactId>crazycrates-plugin</artifactId>
-    <version>{Latest Version}</version>
+    <version>1.10.2</version>
+    <scope>provided</scope>
 </dependency>
 ```
