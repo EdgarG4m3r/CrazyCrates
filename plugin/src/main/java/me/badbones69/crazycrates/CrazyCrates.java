@@ -30,6 +30,10 @@ import me.badbones69.crazycrates.multisupport.Support;
 import me.badbones69.crazycrates.multisupport.placeholders.MVdWPlaceholderAPISupport;
 import me.badbones69.crazycrates.multisupport.placeholders.PlaceholderAPISupport;
 import org.bstats.bukkit.Metrics;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.PluginCommand;
+import org.bukkit.command.TabCompleter;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -125,24 +129,29 @@ public class CrazyCrates extends JavaPlugin implements Listener {
             MVdWPlaceholderAPISupport.registerPlaceholders(plugin);
         }
 
-        boolean metricsEnabled = Files.CONFIG.getFile().getBoolean("Settings.Toggle-Metrics");
+        FileConfiguration config = Files.CONFIG.getFile();
 
-        if (Files.CONFIG.getFile().getString("Settings.Toggle-Metrics") != null) {
-            if (metricsEnabled) new Metrics(plugin, 4514);
-        } else {
-            getLogger().warning("Metrics was automatically enabled.");
-            getLogger().warning("Please add Toggle-Metrics: false to the top of your config.yml");
-            getLogger().warning("https://github.com/Crazy-Crew/Crazy-Crates/blob/main/src/main/resources/config.yml");
+        boolean metricsEnabled = config.getBoolean("Settings.Toggle-Metrics");
+        String metricsPath = config.getString("Settings.Toggle-Metrics");
 
-            getLogger().warning("An example if confused is linked above.");
+        if (metricsPath == null) {
+            config.set("Settings.Toggle-Metrics", true);
 
-            new Metrics(plugin, 4514);
+            Files.CONFIG.saveFile();
         }
 
-        getCommand("key").setExecutor(new KeyCommand());
-        getCommand("key").setTabCompleter(new KeyTab());
-        getCommand("crazycrates").setExecutor(new CCCommand());
-        getCommand("crazycrates").setTabCompleter(new CCTab());
+        if (metricsEnabled) new Metrics(this, 4514);
+
+        registerCommand(getCommand("key"), new KeyTab(), new KeyCommand());
+        registerCommand(getCommand("crazycrates"), new CCTab(), new CCCommand());
+    }
+
+    private void registerCommand(PluginCommand pluginCommand, TabCompleter tabCompleter, CommandExecutor commandExecutor) {
+        if (pluginCommand != null) {
+            pluginCommand.setExecutor(commandExecutor);
+
+            if (tabCompleter != null) pluginCommand.setTabCompleter(tabCompleter);
+        }
     }
 
     @Override
