@@ -37,5 +37,4 @@ public class DecentHologramsSupport implements HologramController {
         holograms.forEach((key, value) -> value.delete());
         holograms.clear();
     }
-    
 }
