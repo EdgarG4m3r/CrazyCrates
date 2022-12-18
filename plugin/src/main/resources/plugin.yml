@@ -1,12 +1,12 @@
-name: CrazyCrates
-main: me.badbones69.crazycrates.CrazyCrates
+name: ${name}
+main: "${group}.CrazyCrates"
 author: BadBones69
-version: ${project.version}${build.number}
+version: ${version}
 api-version: 1.13
 
 softdepend: [HolographicDisplays, Holograms, DecentHolograms, MVdWPlaceholderAPI, PlaceholderAPI]
-description: Want some good quality crates without paying money for them? Then check this crate plugin out.
-
+description: ${description}
+  
 commands:
   crazycrates:
     description: Opens the GUI.
