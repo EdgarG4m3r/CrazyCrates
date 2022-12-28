@@ -7,7 +7,7 @@ https://ci.crazycrew.us/view/Legacy/job/CrazyCrates-Legacy/
 ### Build Status:
 [![Build Status](https://ci.crazycrew.us/view/Legacy/job/CrazyCrates-Legacy/badge/icon)](https://ci.crazycrew.us/view/Legacy/job/CrazyCrates-Legacy/)
 
-## Repository:
+## Repo:
 https://repo.crazycrew.us/#/legacy
 
 ## Maven:
