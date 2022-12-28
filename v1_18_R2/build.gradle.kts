@@ -6,7 +6,6 @@ dependencies {
 
 tasks {
     compileJava {
-        sourceCompatibility = "8"
-        targetCompatibility = "8"
+        options.release.set(17)
     }
 }
