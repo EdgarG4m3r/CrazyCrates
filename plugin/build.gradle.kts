@@ -61,8 +61,8 @@ val buildNumber: String? = System.getenv("BUILD_NUMBER")
 val buildVersion = "${rootProject.version}-b$buildNumber-SNAPSHOT"
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 tasks {
