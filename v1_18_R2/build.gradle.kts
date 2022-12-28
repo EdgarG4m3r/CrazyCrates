@@ -4,8 +4,7 @@ dependencies {
     compileOnly("org.spigotmc", "spigot", "${project.extra["minecraft_version"]}-R0.1-SNAPSHOT")
 }
 
-tasks {
-    compileJava {
-        options.release.set(17)
-    }
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }

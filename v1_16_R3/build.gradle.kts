@@ -4,9 +4,7 @@ dependencies {
     compileOnly("org.spigotmc", "spigot", "1.16.5-R0.1-SNAPSHOT")
 }
 
-tasks {
-    compileJava {
-        sourceCompatibility = "8"
-        targetCompatibility = "8"
-    }
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }

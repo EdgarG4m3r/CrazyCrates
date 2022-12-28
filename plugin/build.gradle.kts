@@ -77,8 +77,9 @@ tasks {
         }
     }
 
-    compileJava {
-        options.release.set(17)
+    java {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 
     processResources {
