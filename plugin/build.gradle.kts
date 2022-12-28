@@ -28,8 +28,6 @@ dependencies {
     implementation(project(":v1_8_R3"))
     implementation(project(":v1_12_R1"))
     implementation(project(":v1_16_R3"))
-    implementation(project(":v1_17_R1"))
-    implementation(project(":v1_18_R2"))
 
     implementation("de.tr7zw", "nbt-data-api", "2.11.1")
 
@@ -61,8 +59,8 @@ val buildNumber: String? = System.getenv("BUILD_NUMBER")
 val buildVersion = "${rootProject.version}-b$buildNumber-SNAPSHOT"
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 tasks {
