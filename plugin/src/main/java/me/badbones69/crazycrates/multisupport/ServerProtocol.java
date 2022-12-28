@@ -1,6 +1,7 @@
 package me.badbones69.crazycrates.multisupport;
 
 import me.badbones69.crazycrates.api.CrazyManager;
+import org.bukkit.Bukkit;
 
 /**
  * @Author Badbones69
@@ -26,15 +27,13 @@ public enum ServerProtocol {
 
     private final int versionProtocol;
 
-    private static final CrazyManager crazyManager = CrazyManager.getInstance();
-
     ServerProtocol(int versionProtocol) {
         this.versionProtocol = versionProtocol;
     }
 
     public static ServerProtocol getCurrentProtocol() {
 
-        String serVer = crazyManager.getPlugin().getServer().getClass().getPackage().getName();
+        String serVer = Bukkit.getServer().getClass().getPackage().getName();
 
         int serProt = Integer.parseInt(
                 serVer.substring(
