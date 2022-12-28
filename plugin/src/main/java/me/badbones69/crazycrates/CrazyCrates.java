@@ -53,6 +53,11 @@ public class CrazyCrates extends JavaPlugin implements Listener {
     
     @Override
     public void onEnable() {
+        if (ServerProtocol.isAtLeast(ServerProtocol.v1_17_R1)) {
+            plugin.getLogger().warning("This jar only works on 1.16.5 & below.");
+            isEnabled = false;
+            getServer().getPluginManager().disablePlugin(this);
+        }
 
         // Initialize the plugin variable.
         crazyManager.loadPlugin(this);

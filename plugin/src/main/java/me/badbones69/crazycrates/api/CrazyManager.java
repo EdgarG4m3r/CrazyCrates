@@ -218,12 +218,6 @@ public class CrazyManager {
             case v1_16_R3:
                 nmsSupport = new NMS_v1_16_R3();
                 break;
-            case v1_17_R1:
-                nmsSupport = new NMS_v1_17_R1();
-                break;
-            case v1_18_R2:
-                nmsSupport = new NMS_v1_18_R2();
-                break;
         }
 
         quadCrateTimer = FileManager.Files.CONFIG.getFile().getInt("Settings.QuadCrate.Timer") * 20;
