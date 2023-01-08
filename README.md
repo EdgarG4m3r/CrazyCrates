@@ -7,17 +7,66 @@ https://modrinth.com/plugin/crazycrates/version/1.10.2
 ## Repository:
 https://repo.crazycrew.us/#/releases
 
-## Maven:
+# Developer API
+
+## Groovy
+<details>
+ <summary>
+   Gradle (Groovy)
+ </summary>
+
+```gradle
+repositories {
+    maven {
+        url = "https://repo.crazycrew.us/releases"
+    }
+}
+```
+
+```gradle
+dependencies {
+    compileOnly "me.badbones69.crazycrates:crazycrates:1.10.2"
+}
+```
+</details>
+
+## Kotlin
+<details>
+ <summary>
+   Gradle (Kotlin)
+ </summary>
+
+```gradle
+repositories {
+    maven("https://repo.crazycrew.us/releases")
+}
+```
+
+```gradle
+dependencies {
+    compileOnly("me.badbones69.crazycrates", "crazycrates", "1.10.2")
+}
+```
+</details>
+
+## Maven
+<details>
+ <summary>
+   Maven
+ </summary>
+
 ```xml
 <repository>
-    <id>crazycrew-releases</id>
-    <url>https://repo.crazycrew.us/releases</url>
+  <id>crazycrew</id>
+  <url>https://repo.crazycrew.us/releases</url>
 </repository>
-
-<dependency>
-    <groupId>me.badbones69</groupId>
-    <artifactId>crazycrates</artifactId>
-    <version>1.10.2</version>
-    <scope>provided</scope>
-</dependency>
 ```
+
+```xml
+<dependency>
+  <groupId>me.badbones69.crazycrates</groupId>
+  <artifactId>crazycrates</artifactId>
+  <version>1.10.2</version>
+ </dependency>
+```
+</details>
