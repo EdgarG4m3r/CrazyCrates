@@ -3,6 +3,8 @@ plugins {
 
     `maven-publish`
 
+    id("com.modrinth.minotaur") version "2.6.0"
+
     id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
@@ -28,6 +30,7 @@ dependencies {
     implementation(project(":v1_8_R3"))
     implementation(project(":v1_12_R1"))
     implementation(project(":v1_16_R3"))
+    implementation(project(":v1_17_R1"))
 
     implementation("de.tr7zw", "nbt-data-api", "2.11.1")
 
@@ -56,7 +59,7 @@ dependencies {
 }
 
 val buildNumber: String? = System.getenv("BUILD_NUMBER")
-val buildVersion = "${rootProject.version}-b$buildNumber-SNAPSHOT"
+val buildVersion = "${rootProject.version}-b$buildNumber"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -65,11 +68,7 @@ java {
 
 tasks {
     shadowJar {
-        if (buildNumber != null) {
-            archiveFileName.set("${rootProject.name}-${buildVersion}.jar")
-        } else {
-            archiveFileName.set("${rootProject.name}-${rootProject.version}.jar")
-        }
+        archiveFileName.set("${rootProject.name}-${rootProject.version}.jar")
 
         listOf(
             "de.tr7zw",
@@ -80,6 +79,31 @@ tasks {
         }
     }
 
+    modrinth {
+        token.set(System.getenv("MODRINTH_TOKEN"))
+        projectId.set("crazycrates")
+
+        versionName.set("${rootProject.name} ${project.version}")
+        versionNumber.set("${project.version}")
+
+        versionType.set("release")
+
+        uploadFile.set(shadowJar.get())
+
+        autoAddDependsOn.set(true)
+
+        gameVersions.addAll(listOf("1.8", "1.8.8", "1.12.2", "1.16.5", "1.17.1"))
+        loaders.addAll(listOf("spigot", "paper", "purpur"))
+
+        //<h3>The first release for CrazyCrates on Modrinth! 🎉🎉🎉🎉🎉<h3><br> If we want a header.
+        changelog.set("""
+                <h2>Notice:</h2>
+                 <p>This is only for Legacy Support, No new features will be added.</p>
+                <h2>Bug Fixes:</h2>
+                 <p>N/A</p>
+            """.trimIndent())
+    }
+
     processResources {
         filesMatching("plugin.yml") {
             expand(
@@ -88,6 +112,28 @@ tasks {
                 "version" to if (buildNumber != null) buildVersion else rootProject.version,
                 "description" to rootProject.description
             )
+        }
+    }
+}
+
+publishing {
+    repositories {
+        maven("https://repo.crazycrew.us/legacy") {
+            name = "crazycrew"
+            //credentials(PasswordCredentials::class)
+            credentials {
+                username = System.getenv("REPOSITORY_USERNAME")
+                password = System.getenv("REPOSITORY_PASSWORD")
+            }
+        }
+    }
+
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "${extra["plugin_group"]}"
+            artifactId = rootProject.name.toLowerCase()
+            version = "${project.version}"
+            from(components["java"])
         }
     }
 }

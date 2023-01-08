@@ -41,7 +41,7 @@ public class PlaceholderAPISupport extends PlaceholderExpansion {
 
     @Override
     public @NotNull String getIdentifier() {
-        return "CrazyCrates";
+        return crazyManager.getPlugin().getDescription().getName();
     }
 
     @Override
@@ -53,5 +53,4 @@ public class PlaceholderAPISupport extends PlaceholderExpansion {
     public @NotNull String getVersion() {
         return crazyManager.getPlugin().getDescription().getVersion();
     }
-
 }
