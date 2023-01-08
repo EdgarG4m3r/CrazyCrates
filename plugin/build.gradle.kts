@@ -61,11 +61,6 @@ dependencies {
 val buildNumber: String? = System.getenv("BUILD_NUMBER")
 val buildVersion = "${rootProject.version}-b$buildNumber"
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-}
-
 tasks {
     shadowJar {
         archiveFileName.set("${rootProject.name}-${rootProject.version}.jar")
