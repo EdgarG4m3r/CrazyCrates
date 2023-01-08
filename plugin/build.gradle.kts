@@ -83,10 +83,10 @@ tasks {
         token.set(System.getenv("MODRINTH_TOKEN"))
         projectId.set("crazycrates")
 
-        versionName.set("${rootProject.name} ${project.version}")
-        versionNumber.set("${project.version}")
+        versionName.set("${rootProject.name} ${rootProject.version}")
+        versionNumber.set("${rootProject.version}")
 
-        versionType.set("release")
+        versionType.set("alpha")
 
         uploadFile.set(shadowJar.get())
 
@@ -120,7 +120,6 @@ publishing {
     repositories {
         maven("https://repo.crazycrew.us/legacy") {
             name = "crazycrew"
-            //credentials(PasswordCredentials::class)
             credentials {
                 username = System.getenv("REPOSITORY_USERNAME")
                 password = System.getenv("REPOSITORY_PASSWORD")
