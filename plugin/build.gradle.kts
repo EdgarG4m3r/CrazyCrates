@@ -55,9 +55,6 @@ dependencies {
     }
 }
 
-val buildNumber: String? = System.getenv("BUILD_NUMBER")
-val buildVersion = "${rootProject.version}-b$buildNumber"
-
 tasks {
     shadowJar {
         archiveFileName.set("${rootProject.name}-${rootProject.version}.jar")
@@ -101,7 +98,7 @@ tasks {
             expand(
                 "name" to rootProject.name,
                 "group" to rootProject.group,
-                "version" to if (buildNumber != null) buildVersion else rootProject.version,
+                "version" to rootProject.version,
                 "description" to rootProject.description
             )
         }
