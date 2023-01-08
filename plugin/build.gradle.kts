@@ -87,7 +87,7 @@ tasks {
 
         autoAddDependsOn.set(true)
 
-        gameVersions.addAll(listOf("1.8", "1.8.8", "1.12.2", "1.16.5", "1.17.1"))
+        gameVersions.addAll(listOf("1.8", "1.8.8", "1.12.2", "1.16.5"))
         loaders.addAll(listOf("spigot", "paper", "purpur"))
 
         //<h3>The first release for CrazyCrates on Modrinth! 🎉🎉🎉🎉🎉<h3><br> If we want a header.
