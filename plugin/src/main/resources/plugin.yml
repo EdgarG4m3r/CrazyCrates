@@ -3,6 +3,7 @@ main: "${group}.CrazyCrates"
 author: BadBones69
 version: ${version}
 api-version: 1.13
+website: ${website}
 
 softdepend: [HolographicDisplays, Holograms, DecentHolograms, MVdWPlaceholderAPI, PlaceholderAPI]
 description: ${description}
