@@ -2,7 +2,7 @@ name: Release Legacy Build
 on:
   push:
     branches:
-      - main
+      - legacy
   workflow_dispatch:
     inputs:
       logLevel:
