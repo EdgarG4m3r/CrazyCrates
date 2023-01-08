@@ -2,8 +2,6 @@ plugins {
     `java-library`
 }
 
-rootProject.group = "${extra["plugin_group"]}"
-rootProject.version = "${extra["plugin_version"]}"
 rootProject.description = "Add unlimited crates to your server with 10 different crate types to choose from!"
 
 allprojects {

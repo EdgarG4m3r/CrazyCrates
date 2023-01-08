@@ -113,8 +113,9 @@ tasks {
 
 publishing {
     repositories {
-        maven("https://repo.crazycrew.us/legacy") {
+        maven("https://repo.crazycrew.us/releases") {
             name = "crazycrew"
+            //credentials(PasswordCredentials::class)
             credentials {
                 username = System.getenv("REPOSITORY_USERNAME")
                 password = System.getenv("REPOSITORY_PASSWORD")
@@ -124,9 +125,9 @@ publishing {
 
     publications {
         create<MavenPublication>("maven") {
-            groupId = "${extra["plugin_group"]}"
+            groupId = "${rootProject.group}"
             artifactId = rootProject.name.toLowerCase()
-            version = "${project.version}"
+            version = "${rootProject.version}"
             from(components["java"])
         }
     }

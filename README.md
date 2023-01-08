@@ -1,25 +1,22 @@
 # Crazy Crates
-The legacy source for CrazyCrates ( 1.8 -> 1.18.2 )
+The legacy source for CrazyCrates ( 1.8 -> 1.16.5 )
 
-## Jenkins: 
-https://ci.crazycrew.us/view/Legacy/job/CrazyCrates-Legacy/
+## Download: 
+https://modrinth.com/plugin/crazycrates/version/1.10.2
 
-### Build Status:
-[![Build Status](https://ci.crazycrew.us/view/Legacy/job/CrazyCrates-Legacy/badge/icon)](https://ci.crazycrew.us/view/Legacy/job/CrazyCrates-Legacy/)
-
-## Repo:
-https://repo.crazycrew.us/#/legacy
+## Repository:
+https://repo.crazycrew.us/#/releases
 
 ## Maven:
 ```xml
 <repository>
-    <id>crazycrew-legacy</id>
-    <url>https://repo.crazycrew.us/legacy</url>
+    <id>crazycrew-releases</id>
+    <url>https://repo.crazycrew.us/releases</url>
 </repository>
 
 <dependency>
-    <groupId>com.badbones69</groupId>
-    <artifactId>crazycrates-plugin</artifactId>
+    <groupId>me.badbones69</groupId>
+    <artifactId>crazycrates</artifactId>
     <version>1.10.2</version>
     <scope>provided</scope>
 </dependency>
