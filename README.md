@@ -2,7 +2,8 @@
 The legacy source for CrazyCrates ( 1.8 -> 1.16.5 )
 
 ## Download: 
-https://modrinth.com/plugin/crazycrates/version/1.10.2
+All versions labeled "Alpha" are legacy versions.
+https://modrinth.com/plugin/crazycrates/versions
 
 ## Repository:
 https://repo.crazycrew.us/#/releases
@@ -25,7 +26,7 @@ repositories {
 
 ```gradle
 dependencies {
-    compileOnly "me.badbones69.crazycrates:crazycrates:1.10.2"
+    compileOnly "me.badbones69.crazycrates:crazycrates:1.10.2.1"
 }
 ```
 </details>
@@ -44,7 +45,7 @@ repositories {
 
 ```gradle
 dependencies {
-    compileOnly("me.badbones69.crazycrates", "crazycrates", "1.10.2")
+    compileOnly("me.badbones69.crazycrates", "crazycrates", "1.10.2.1")
 }
 ```
 </details>
@@ -66,7 +67,7 @@ dependencies {
 <dependency>
   <groupId>me.badbones69.crazycrates</groupId>
   <artifactId>crazycrates</artifactId>
-  <version>1.10.2</version>
+  <version>1.10.2.1</version>
  </dependency>
 ```
 </details>
