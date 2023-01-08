@@ -1,6 +1,4 @@
 plugins {
-    `java-library`
-
     `maven-publish`
 
     id("com.modrinth.minotaur") version "2.6.0"
