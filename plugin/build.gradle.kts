@@ -30,7 +30,6 @@ dependencies {
     implementation(project(":v1_8_R3"))
     implementation(project(":v1_12_R1"))
     implementation(project(":v1_16_R3"))
-    // implementation(project(":v1_17_R1"))
 
     implementation("de.tr7zw", "nbt-data-api", "2.11.1")
 
@@ -87,13 +86,13 @@ tasks {
 
         autoAddDependsOn.set(true)
 
-        gameVersions.addAll(listOf("1.8", "1.8.8", "1.12.2", "1.16.5"))
-        loaders.addAll(listOf("spigot", "paper", "purpur"))
+        gameVersions.addAll(listOf("1.8.8", "1.12.2", "1.16.5"))
+        loaders.addAll(listOf("spigot", "paper"))
 
         //<h3>The first release for CrazyCrates on Modrinth! 🎉🎉🎉🎉🎉<h3><br> If we want a header.
         changelog.set("""
                 <h2>Notice:</h2>
-                 <p>This is only for Legacy ( 1.8 - 1.17.1 ) Support, No new features will be added.</p>
+                 <p>This is only for Legacy ( 1.8 - 1.16.5 ) Support, No new features will be added.</p>
                 <h2>Bug Fixes:</h2>
                  <p>N/A</p>
             """.trimIndent())
