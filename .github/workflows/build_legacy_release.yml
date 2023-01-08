@@ -20,7 +20,10 @@ jobs:
       - uses: actions/setup-java@main
         with:
           distribution: temurin
-          java-version: 8
+          java-version: |
+            8
+            11
+            16
 
       - name: Gradle Properties Import.
         shell: bash
