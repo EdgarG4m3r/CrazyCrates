@@ -98,7 +98,7 @@ tasks {
         //<h3>The first release for CrazyCrates on Modrinth! 🎉🎉🎉🎉🎉<h3><br> If we want a header.
         changelog.set("""
                 <h2>Notice:</h2>
-                 <p>This is only for Legacy Support, No new features will be added.</p>
+                 <p>This is only for Legacy ( 1.8 - 1.17.1 ) Support, No new features will be added.</p>
                 <h2>Bug Fixes:</h2>
                  <p>N/A</p>
             """.trimIndent())
