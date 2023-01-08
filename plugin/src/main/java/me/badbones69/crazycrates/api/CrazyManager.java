@@ -36,7 +36,6 @@ import me.badbones69.crazycrates.api.events.PlayerReceiveKeyEvent;
 import me.badbones69.crazycrates.api.events.PlayerReceiveKeyEvent.KeyReciveReason;
 import me.badbones69.crazycrates.api.interfaces.HologramController;
 import me.badbones69.crazycrates.controllers.GUIMenu;
-import me.badbones69.crazycrates.multisupport.nms.v1_17_R1.NMS_v1_17_R1;
 import me.badbones69.crazycrates.multisupport.nms.v1_8_R3.NMS_v1_8_R3;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Location;
@@ -217,9 +216,9 @@ public class CrazyManager {
             case v1_16_R3:
                 nmsSupport = new NMS_v1_16_R3();
                 break;
-            case v1_17_R1:
-                nmsSupport = new NMS_v1_17_R1();
-                break;
+            //case v1_17_R1:
+            //    nmsSupport = new NMS_v1_17_R1();
+            //   break;
         }
 
         quadCrateTimer = FileManager.Files.CONFIG.getFile().getInt("Settings.QuadCrate.Timer") * 20;

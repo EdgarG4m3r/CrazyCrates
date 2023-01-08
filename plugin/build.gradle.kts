@@ -30,7 +30,7 @@ dependencies {
     implementation(project(":v1_8_R3"))
     implementation(project(":v1_12_R1"))
     implementation(project(":v1_16_R3"))
-    implementation(project(":v1_17_R1"))
+    // implementation(project(":v1_17_R1"))
 
     implementation("de.tr7zw", "nbt-data-api", "2.11.1")
 
