@@ -22,8 +22,6 @@ jobs:
           distribution: temurin
           java-version: |
             8
-            11
-            16
 
       - name: Gradle Properties Import.
         shell: bash
@@ -34,6 +32,9 @@ jobs:
 
       - name: Shadow Jar
         run: ./gradlew shadowJar --stacktrace
+        env:
+          REPOSITORY_USERNAME: ${{ secrets.CRAZYCREW_USERNAME }}
+          REPOSITORY_PASSWORD: ${{ secrets.CRAZYCREW_PASSWORD }}
 
       - name: Modrinth Publish
         run: ./gradlew modrinth --stacktrace

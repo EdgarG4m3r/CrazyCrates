@@ -53,19 +53,21 @@ public class CrazyCrates extends JavaPlugin implements Listener {
     
     @Override
     public void onEnable() {
-        if (ServerProtocol.isAtLeast(ServerProtocol.v1_17_R1)) {
-            plugin.getLogger().warning("This jar only works on 1.16.5 & below.");
+        if (ServerProtocol.isNewer(ServerProtocol.v1_17_R1)) {
+            plugin.getLogger().warning("This jar only works on 1.17.X & below.");
             isEnabled = false;
             getServer().getPluginManager().disablePlugin(this);
+
+            return;
         }
 
         // Initialize the plugin variable.
         crazyManager.loadPlugin(this);
 
         // Crate Files
-        String extensions = ServerProtocol.getCurrentProtocol().isNewer(ServerProtocol.v1_12_R1) ? "nbt" : "schematic";
-        String cratesFolder = ServerProtocol.getCurrentProtocol().isNewer(ServerProtocol.v1_12_R1) ? "/Crates1.13-Up" : "/Crates1.12.2-Down";
-        String schemFolder = ServerProtocol.getCurrentProtocol().isNewer(ServerProtocol.v1_12_R1) ? "/Schematics1.13-Up" : "/Schematics1.12.2-Down";
+        String extensions = ServerProtocol.isNewer(ServerProtocol.v1_12_R1) ? "nbt" : "schematic";
+        String cratesFolder = ServerProtocol.isNewer(ServerProtocol.v1_12_R1) ? "/Crates1.13-Up" : "/Crates1.12.2-Down";
+        String schemFolder = ServerProtocol.isNewer(ServerProtocol.v1_12_R1) ? "/Schematics1.13-Up" : "/Schematics1.12.2-Down";
 
         fileManager.logInfo(true)
                 .registerDefaultGenerateFiles("Basic.yml", "/Crates", cratesFolder)
