@@ -1,12 +1,12 @@
 package me.badbones69.crazycrates.multisupport.holograms;
 
+import com.gmail.filoghost.holographicdisplays.api.Hologram;
+import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import me.badbones69.crazycrates.Methods;
 import me.badbones69.crazycrates.api.CrazyManager;
 import me.badbones69.crazycrates.api.interfaces.HologramController;
 import me.badbones69.crazycrates.api.objects.Crate;
 import me.badbones69.crazycrates.api.objects.CrateHologram;
-import me.filoghost.holographicdisplays.api.HolographicDisplaysAPI;
-import me.filoghost.holographicdisplays.api.hologram.Hologram;
 import org.bukkit.block.Block;
 import java.util.HashMap;
 
@@ -14,19 +14,15 @@ public class HolographicSupport implements HologramController {
     
     private static final CrazyManager crazyManager = CrazyManager.getInstance();
     private static final HashMap<Block, Hologram> holograms = new HashMap<>();
-
-    private static final HolographicDisplaysAPI api = HolographicDisplaysAPI.get(crazyManager.getPlugin());
     
     public void createHologram(Block block, Crate crate) {
         CrateHologram crateHologram = crate.getHologram();
 
         if (crateHologram.isEnabled()) {
             double height = crateHologram.getHeight();
-            Hologram hologram = api.createHologram(block.getLocation().add(.5, height, .5));
+            Hologram hologram = HologramsAPI.createHologram(crazyManager.getPlugin(), block.getLocation().add(.5, height, .5));
 
-            for (String line : crateHologram.getMessages()) {
-                hologram.getLines().appendText(Methods.color(line));
-            }
+            crateHologram.getMessages().stream().map(Methods::color).forEach(hologram::appendTextLine);
 
             holograms.put(block, hologram);
         }
