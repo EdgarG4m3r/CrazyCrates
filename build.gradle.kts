@@ -2,8 +2,6 @@ plugins {
     `java-library`
 }
 
-rootProject.description = "Add unlimited crates to your server with 10 different crate types to choose from!"
-
 allprojects {
     apply(plugin = "java-library")
 
