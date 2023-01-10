@@ -1,6 +1,6 @@
 package me.badbones69.crazycrates.multisupport;
 
-import me.badbones69.crazycrates.api.CrazyManager;
+import me.badbones69.crazycrates.CrazyCrates;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Skull;
@@ -20,8 +20,8 @@ import java.util.UUID;
  */
 public class SkullCreator {
 
-    private final static CrazyManager crazyManager = CrazyManager.getInstance();
-    
+    private final static CrazyCrates plugin = CrazyCrates.getPlugin();
+
     /**
      * Creates a player skull based on a player's name.
      *
@@ -51,7 +51,7 @@ public class SkullCreator {
         notNull(item, "item");
         notNull(name, "name");
         
-        return crazyManager.getPlugin().getServer().getUnsafe().modifyItemStack(item,
+        return plugin.getServer().getUnsafe().modifyItemStack(item,
         "{SkullOwner:\"" + name + "\"}"
         );
     }
@@ -80,7 +80,7 @@ public class SkullCreator {
         notNull(id, "id");
         
         SkullMeta meta = (SkullMeta) item.getItemMeta();
-        meta.setOwningPlayer(crazyManager.getPlugin().getServer().getOfflinePlayer(id));
+        meta.setOwningPlayer(plugin.getServer().getOfflinePlayer(id));
         item.setItemMeta(meta);
         
         return item;
@@ -135,7 +135,7 @@ public class SkullCreator {
         notNull(base64, "base64");
         
         UUID hashAsId = new UUID(base64.hashCode(), base64.hashCode());
-        return crazyManager.getPlugin().getServer().getUnsafe().modifyItemStack(item,
+        return plugin.getServer().getUnsafe().modifyItemStack(item,
         "{SkullOwner:{Id:\"" + hashAsId + "\",Properties:{textures:[{Value:\"" + base64 + "\"}]}}}"
         );
     }
@@ -154,7 +154,7 @@ public class SkullCreator {
         notNull(name, "name");
         
         setBlockType(block);
-        ((Skull) block.getState()).setOwningPlayer(crazyManager.getPlugin().getServer().getOfflinePlayer(name));
+        ((Skull) block.getState()).setOwningPlayer(plugin.getServer().getOfflinePlayer(name));
     }
     
     /**
@@ -168,7 +168,7 @@ public class SkullCreator {
         notNull(id, "id");
         
         setBlockType(block);
-        ((Skull) block.getState()).setOwningPlayer(crazyManager.getPlugin().getServer().getOfflinePlayer(id));
+        ((Skull) block.getState()).setOwningPlayer(plugin.getServer().getOfflinePlayer(id));
     }
     
     /**
@@ -205,9 +205,9 @@ public class SkullCreator {
         );
         
         if (newerApi()) {
-            crazyManager.getPlugin().getServer().dispatchCommand(crazyManager.getPlugin().getServer().getConsoleSender(), "data merge block " + args);
+            plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), "data merge block " + args);
         } else {
-            crazyManager.getPlugin().getServer().dispatchCommand(crazyManager.getPlugin().getServer().getConsoleSender(), "blockdata " + args);
+            plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), "blockdata " + args);
         }
     }
     
@@ -237,9 +237,7 @@ public class SkullCreator {
     }
     
     private static void notNull(Object o, String name) {
-        if (o == null) {
-            throw new NullPointerException(name + " should not be null!");
-        }
+        if (o == null) throw new NullPointerException(name + " should not be null!");
     }
     
     private static String urlToBase64(String url) {
@@ -253,7 +251,6 @@ public class SkullCreator {
         String toEncode = "{\"textures\":{\"SKIN\":{\"url\":\"" + actualUrl + "\"}}}";
         return Base64.getEncoder().encodeToString(toEncode.getBytes());
     }
-    
 }
 
 /* Format for skull

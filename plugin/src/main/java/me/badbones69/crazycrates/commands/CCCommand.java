@@ -1,5 +1,6 @@
 package me.badbones69.crazycrates.commands;
 
+import me.badbones69.crazycrates.CrazyCrates;
 import me.badbones69.crazycrates.Methods;
 import me.badbones69.crazycrates.api.CrazyManager;
 import me.badbones69.crazycrates.api.FileManager;
@@ -32,18 +33,17 @@ import java.io.File;
 import java.util.HashMap;
 
 public class CCCommand implements CommandExecutor {
-    
-    private final FileManager fileManager = FileManager.getInstance();
-    private final CrazyManager crazyManager = CrazyManager.getInstance();
+
+    private final CrazyCrates plugin = CrazyCrates.getPlugin();
+    private final FileManager fileManager = plugin.getFileManager();
+    private final CrazyManager crazyManager = plugin.getCrazyManager();
     
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String commandLabel, String[] args) {
         if (args.length == 0) {
 
             if (sender instanceof Player) {
-                if (!Methods.permCheck(sender, "menu")) {
-                    return true;
-                }
+                if (!Methods.permCheck(sender, "menu")) return true;
             } else {
                 sender.sendMessage(Messages.MUST_BE_A_PLAYER.getMessage());
                 return true;
@@ -96,7 +96,7 @@ public class CCCommand implements CommandExecutor {
 
                 if (locations != null && locations[0] != null && locations[1] != null) {
                     if (args.length >= 2) {
-                        File file = new File(crazyManager.getPlugin().getDataFolder() + "/Schematics/" + args[1]);
+                        File file = new File(plugin.getDataFolder() + "/Schematics/" + args[1]);
                         crazyManager.getNMSSupport().saveSchematic(locations, sender.getName(), file);
                         sender.sendMessage(Methods.getPrefix("&7Saved the " + args[1] + ".nbt into the Schematics folder."));
                         crazyManager.loadSchematics();
@@ -125,7 +125,7 @@ public class CCCommand implements CommandExecutor {
                             try {
                                 crate.addEditorItem(prize, item);
                             } catch (Exception e) {
-                                crazyManager.getPlugin().getLogger().warning( "Failed to add a new prize to the " + crate.getName() + " crate.");
+                                plugin.getLogger().warning( "Failed to add a new prize to the " + crate.getName() + " crate.");
                                 e.printStackTrace();
                             }
 
@@ -149,7 +149,7 @@ public class CCCommand implements CommandExecutor {
                 if (!Methods.permCheck(sender, "admin")) return true;
 
                 fileManager.reloadAllFiles();
-                fileManager.setup(crazyManager.getPlugin());
+                fileManager.setup();
 
                 if (!FileManager.Files.LOCATIONS.getFile().contains("Locations")) {
                     FileManager.Files.LOCATIONS.getFile().set("Locations.Clear", null);
@@ -197,13 +197,11 @@ public class CCCommand implements CommandExecutor {
                 int slots = 9;
                 for (; size > 9; size -= 9) slots += 9;
 
-                Inventory inv = crazyManager.getPlugin().getServer().createInventory(null, slots, Methods.color("&4&lAdmin Keys"));
+                Inventory inv = plugin.getServer().createInventory(null, slots, Methods.color("&4&lAdmin Keys"));
 
                 for (Crate crate : crazyManager.getCrates()) {
                     if (crate.getCrateType() != CrateType.MENU) {
-                        if (inv.firstEmpty() >= 0) {
-                            inv.setItem(inv.firstEmpty(), crate.getAdminKey());
-                        }
+                        if (inv.firstEmpty() >= 0) inv.setItem(inv.firstEmpty(), crate.getAdminKey());
                     }
                 }
 
@@ -227,9 +225,7 @@ public class CCCommand implements CommandExecutor {
                 brokecrates = brokecratesBuilder.toString();
                 sender.sendMessage(Methods.color("&e&lCrates:&f " + crates));
 
-                if (brokecrates.length() > 0) {
-                    sender.sendMessage(Methods.color("&6&lBroken Crates:&f " + brokecrates.substring(0, brokecrates.length() - 2)));
-                }
+                if (brokecrates.length() > 0) sender.sendMessage(Methods.color("&6&lBroken Crates:&f " + brokecrates.substring(0, brokecrates.length() - 2)));
 
                 sender.sendMessage(Methods.color("&e&lAll Crate Locations:"));
                 sender.sendMessage(Methods.color("&c[ID]&8, &c[Crate]&8, &c[World]&8, &c[X]&8, &c[Y]&8, &c[Z]"));
@@ -260,7 +256,7 @@ public class CCCommand implements CommandExecutor {
 
                     for (String name : FileManager.Files.LOCATIONS.getFile().getConfigurationSection("Locations").getKeys(false)) {
                         if (name.equalsIgnoreCase(Loc)) {
-                            World W = crazyManager.getPlugin().getServer().getWorld(FileManager.Files.LOCATIONS.getFile().getString("Locations." + name + ".World"));
+                            World W = plugin.getServer().getWorld(FileManager.Files.LOCATIONS.getFile().getString("Locations." + name + ".World"));
                             int X = FileManager.Files.LOCATIONS.getFile().getInt("Locations." + name + ".X");
                             int Y = FileManager.Files.LOCATIONS.getFile().getInt("Locations." + name + ".Y");
                             int Z = FileManager.Files.LOCATIONS.getFile().getInt("Locations." + name + ".Z");
@@ -315,9 +311,7 @@ public class CCCommand implements CommandExecutor {
                 return true;
             } else if (args[0].equalsIgnoreCase("preview")) { // /crates preview <Crate> [Player]
                 if (sender instanceof Player) {
-                    if (!Methods.permCheck(sender, "preview")) {
-                        return true;
-                    }
+                    if (!Methods.permCheck(sender, "preview")) return true;
                 }
 
                 if (args.length >= 2) {
@@ -326,9 +320,7 @@ public class CCCommand implements CommandExecutor {
 
                     for (Crate c : crazyManager.getCrates()) {
                         if (c.getCrateType() != CrateType.MENU) {
-                            if (c.getName().equalsIgnoreCase(args[1])) {
-                                crate = c;
-                            }
+                            if (c.getName().equalsIgnoreCase(args[1])) crate = c;
                         }
                     }
 
@@ -537,7 +529,7 @@ public class CCCommand implements CommandExecutor {
 
                                 if (crazyManager.getVirtualKeys(player, crate) >= amount) {
                                     PlayerReceiveKeyEvent event = new PlayerReceiveKeyEvent(player, crate, PlayerReceiveKeyEvent.KeyReciveReason.TRANSFER, amount);
-                                    crazyManager.getPlugin().getServer().getPluginManager().callEvent(event);
+                                    plugin.getServer().getPluginManager().callEvent(event);
 
                                     if (!event.isCancelled()) {
                                         crazyManager.takeKeys(amount, player, crate, KeyType.VIRTUAL_KEY, false);
@@ -596,9 +588,9 @@ public class CCCommand implements CommandExecutor {
                             placeholders.put("%Key%", crate.getKey().getItemMeta().getDisplayName());
                             sender.sendMessage(Messages.GIVEN_EVERYONE_KEYS.getMessage(placeholders));
 
-                            for (Player player : crazyManager.getPlugin().getServer().getOnlinePlayers()) {
+                            for (Player player : plugin.getServer().getOnlinePlayers()) {
                                 PlayerReceiveKeyEvent event = new PlayerReceiveKeyEvent(player, crate, PlayerReceiveKeyEvent.KeyReciveReason.GIVE_ALL_COMMAND, amount);
-                                crazyManager.getPlugin().getServer().getPluginManager().callEvent(event);
+                                plugin.getServer().getPluginManager().callEvent(event);
 
                                 if (!event.isCancelled()) {
 
@@ -670,7 +662,7 @@ public class CCCommand implements CommandExecutor {
                 if (args.length >= 3) {
                     if (crate.getCrateType() != CrateType.MENU) {
                         PlayerReceiveKeyEvent event = new PlayerReceiveKeyEvent(target, crate, PlayerReceiveKeyEvent.KeyReciveReason.GIVE_COMMAND, amount);
-                        crazyManager.getPlugin().getServer().getPluginManager().callEvent(event);
+                        plugin.getServer().getPluginManager().callEvent(event);
                         if (!event.isCancelled()) {
 
                             if (crate.getCrateType() == CrateType.CRATE_ON_THE_GO) {
@@ -698,9 +690,7 @@ public class CCCommand implements CommandExecutor {
                             placeholders.put("%Key%", crate.getKey().getItemMeta().getDisplayName());
                             sender.sendMessage(Messages.GIVEN_A_PLAYER_KEYS.getMessage(placeholders));
 
-                            if (target != null) {
-                                target.sendMessage(Messages.OBTAINING_KEYS.getMessage(placeholders));
-                            }
+                            if (target != null) target.sendMessage(Messages.OBTAINING_KEYS.getMessage(placeholders));
                         }
 
                         return true;
@@ -716,9 +706,7 @@ public class CCCommand implements CommandExecutor {
                 if (!Methods.permCheck(sender, "admin")) return true;
                 KeyType keyType = null;
 
-                if (args.length >= 2) {
-                    keyType = KeyType.getFromName(args[1]);
-                }
+                if (args.length >= 2) keyType = KeyType.getFromName(args[1]);
 
                 if (keyType == null || keyType == KeyType.FREE_KEY) {
                     sender.sendMessage(Methods.color(Methods.getPrefix() + "&cPlease use Virtual/V or Physical/P for a Key type."));
@@ -739,9 +727,7 @@ public class CCCommand implements CommandExecutor {
                             placeholders.put("%Player%", sender.getName());
                             sender.sendMessage(Messages.TAKE_A_PLAYER_KEYS.getMessage(placeholders));
 
-                            if (!crazyManager.takeKeys(1, (Player) sender, crate, keyType, false)) {
-                                Methods.failedToTakeKey((Player) sender, crate);
-                            }
+                            if (!crazyManager.takeKeys(1, (Player) sender, crate, keyType, false)) Methods.failedToTakeKey((Player) sender, crate);
 
                             return true;
                         }
@@ -769,9 +755,7 @@ public class CCCommand implements CommandExecutor {
                             placeholders.put("%Player%", sender.getName());
                             sender.sendMessage(Messages.TAKE_A_PLAYER_KEYS.getMessage(placeholders));
 
-                            if (!crazyManager.takeKeys(amount, (Player) sender, crate, keyType, false)) {
-                                Methods.failedToTakeKey((Player) sender, crate);
-                            }
+                            if (!crazyManager.takeKeys(amount, (Player) sender, crate, keyType, false)) Methods.failedToTakeKey((Player) sender, crate);
 
                             return true;
                         }
@@ -797,9 +781,7 @@ public class CCCommand implements CommandExecutor {
                                     placeholders.put("%Player%", target.getName());
                                     sender.sendMessage(Messages.TAKE_A_PLAYER_KEYS.getMessage(placeholders));
 
-                                    if (!crazyManager.takeKeys(amount, target, crate, KeyType.VIRTUAL_KEY, false)) {
-                                        Methods.failedToTakeKey((Player) sender, crate);
-                                    }
+                                    if (!crazyManager.takeKeys(amount, target, crate, KeyType.VIRTUAL_KEY, false)) Methods.failedToTakeKey((Player) sender, crate);
                                 } else {
                                     if (!crazyManager.takeOfflineKeys(args[4], crate, amount)) {
                                         sender.sendMessage(Messages.INTERNAL_ERROR.getMessage());
@@ -818,9 +800,7 @@ public class CCCommand implements CommandExecutor {
                                     placeholders.put("%Player%", target.getName());
                                     sender.sendMessage(Messages.TAKE_A_PLAYER_KEYS.getMessage(placeholders));
 
-                                    if (!crazyManager.takeKeys(amount, target, crate, KeyType.PHYSICAL_KEY, false)) {
-                                        Methods.failedToTakeKey((Player) sender, crate);
-                                    }
+                                    if (!crazyManager.takeKeys(amount, target, crate, KeyType.PHYSICAL_KEY, false)) Methods.failedToTakeKey((Player) sender, crate);
                                 } else {
                                     sender.sendMessage(Messages.NOT_ONLINE.getMessage("%Player%", args[4]));
                                 }
@@ -842,5 +822,4 @@ public class CCCommand implements CommandExecutor {
         sender.sendMessage(Methods.color(Methods.getPrefix() + "&cPlease do /crates help for more info."));
         return true;
     }
-    
 }

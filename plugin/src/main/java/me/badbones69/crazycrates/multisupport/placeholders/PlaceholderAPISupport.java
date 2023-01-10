@@ -1,5 +1,6 @@
 package me.badbones69.crazycrates.multisupport.placeholders;
 
+import me.badbones69.crazycrates.CrazyCrates;
 import me.badbones69.crazycrates.api.CrazyManager;
 import me.badbones69.crazycrates.api.enums.CrateType;
 import me.badbones69.crazycrates.api.objects.Crate;
@@ -11,7 +12,8 @@ import java.text.NumberFormat;
 
 public class PlaceholderAPISupport extends PlaceholderExpansion {
 
-    private final CrazyManager crazyManager = CrazyManager.getInstance();
+    private final CrazyCrates plugin = CrazyCrates.getPlugin();
+    private final CrazyManager crazyManager = plugin.getCrazyManager();
 
     @Override
     public String onRequest(OfflinePlayer player, @NotNull String identifier) {
@@ -41,7 +43,7 @@ public class PlaceholderAPISupport extends PlaceholderExpansion {
 
     @Override
     public @NotNull String getIdentifier() {
-        return crazyManager.getPlugin().getDescription().getName();
+        return plugin.getDescription().getName();
     }
 
     @Override
@@ -51,6 +53,6 @@ public class PlaceholderAPISupport extends PlaceholderExpansion {
 
     @Override
     public @NotNull String getVersion() {
-        return crazyManager.getPlugin().getDescription().getVersion();
+        return plugin.getDescription().getVersion();
     }
 }

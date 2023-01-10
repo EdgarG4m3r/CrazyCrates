@@ -1,5 +1,6 @@
 package me.badbones69.crazycrates.cratetypes;
 
+import me.badbones69.crazycrates.CrazyCrates;
 import me.badbones69.crazycrates.Methods;
 import me.badbones69.crazycrates.api.CrazyManager;
 import me.badbones69.crazycrates.api.enums.KeyType;
@@ -14,8 +15,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.ArrayList;
 
 public class Roulette implements Listener {
-    
-    private static final CrazyManager crazyManager = CrazyManager.getInstance();
+
+    private static final CrazyCrates plugin = CrazyCrates.getPlugin();
+    private static final CrazyManager crazyManager = plugin.getCrazyManager();
     
     private static void setGlass(Inventory inv) {
         for (int i = 0; i < 27; i++) {
@@ -27,7 +29,7 @@ public class Roulette implements Listener {
     }
     
     public static void openRoulette(Player player, Crate crate, KeyType keyType, boolean checkHand) {
-        Inventory inv = crazyManager.getPlugin().getServer().createInventory(null, 27, Methods.sanitizeColor(crate.getFile().getString("Crate.CrateName")));
+        Inventory inv = plugin.getServer().createInventory(null, 27, Methods.sanitizeColor(crate.getFile().getString("Crate.CrateName")));
         setGlass(inv);
         inv.setItem(13, crate.pickPrize(player).getDisplayItem());
         player.openInventory(inv);
@@ -84,11 +86,9 @@ public class Roulette implements Listener {
                         if (prize != null) {
                             crazyManager.givePrize(player, prize);
 
-                            if (prize.useFireworks()) {
-                                Methods.fireWork(player.getLocation().add(0, 1, 0));
-                            }
+                            if (prize.useFireworks()) Methods.fireWork(player.getLocation().add(0, 1, 0));
 
-                            crazyManager.getPlugin().getServer().getPluginManager().callEvent(new PlayerPrizeEvent(player, crate, crate.getName(), prize));
+                            plugin.getServer().getPluginManager().callEvent(new PlayerPrizeEvent(player, crate, crate.getName(), prize));
                         } else {
                             player.sendMessage(Methods.getPrefix("&cNo prize was found, please report this issue if you think this is an error."));
                         }
@@ -97,15 +97,13 @@ public class Roulette implements Listener {
                         new BukkitRunnable() {
                             @Override
                             public void run() {
-                                if (player.getOpenInventory().getTopInventory().equals(inv)) {
-                                    player.closeInventory();
-                                }
+                                if (player.getOpenInventory().getTopInventory().equals(inv)) player.closeInventory();
                             }
-                        }.runTaskLater(crazyManager.getPlugin(), 40);
+                        }.runTaskLater(plugin, 40);
                     }
                 }
             }
-        }.runTaskTimer(crazyManager.getPlugin(), 2, 2));
+        }.runTaskTimer(plugin, 2, 2));
     }
     
     private static ArrayList<Integer> slowSpin() {
@@ -123,5 +121,4 @@ public class Roulette implements Listener {
 
         return slow;
     }
-    
 }

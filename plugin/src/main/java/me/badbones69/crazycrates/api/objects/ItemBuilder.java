@@ -1,7 +1,9 @@
 package me.badbones69.crazycrates.api.objects;
 
+import me.badbones69.crazycrates.CrazyCrates;
 import me.badbones69.crazycrates.Methods;
 import me.badbones69.crazycrates.api.CrazyManager;
+import me.badbones69.crazycrates.api.FileManager;
 import me.badbones69.crazycrates.multisupport.ServerProtocol;
 import me.badbones69.crazycrates.multisupport.SkullCreator;
 import de.tr7zw.changeme.nbtapi.NBTItem;
@@ -271,7 +273,8 @@ public class ItemBuilder {
         return material;
     }
 
-    private final CrazyManager crazyManager = CrazyManager.getInstance();
+    private final CrazyCrates plugin = CrazyCrates.getPlugin();
+    private final CrazyManager crazyManager = plugin.getCrazyManager();
 
     /**
      * Set the type of item and its metadata in the builder.
@@ -365,9 +368,7 @@ public class ItemBuilder {
         }
 
         // 1.13+ added different banner names and so this is quicker than listing every banner color.
-        if (this.material.name().contains("BANNER")) {
-            this.isBanner = true;
-        }
+        if (this.material.name().contains("BANNER")) this.isBanner = true;
 
         return this;
     }
@@ -403,9 +404,7 @@ public class ItemBuilder {
      * @return The ItemBuilder with updated info.
      */
     public ItemBuilder setName(String name) {
-        if (name != null) {
-            this.name = Methods.color(name);
-        }
+        if (name != null) this.name = Methods.color(name);
 
         return this;
     }
@@ -486,9 +485,7 @@ public class ItemBuilder {
      * @return The ItemBuilder with updated info.
      */
     public ItemBuilder addLore(String lore) {
-        if (lore != null) {
-            this.lore.add(Methods.color(lore));
-        }
+        if (lore != null) this.lore.add(Methods.color(lore));
 
         return this;
     }
@@ -621,9 +618,7 @@ public class ItemBuilder {
                 if (split[0].equalsIgnoreCase(pattern.name()) || split[0].equalsIgnoreCase(pattern.getIdentifier())) {
                     DyeColor color = getDyeColor(split[1]);
 
-                    if (color != null) {
-                        addPattern(new Pattern(color, pattern));
-                    }
+                    if (color != null) addPattern(new Pattern(color, pattern));
 
                     break;
                 }
@@ -858,9 +853,7 @@ public class ItemBuilder {
             try {
                 ItemFlag itemFlag = ItemFlag.valueOf(flagString.toUpperCase());
 
-                if (itemFlag != null) {
-                    addItemFlag(itemFlag);
-                }
+                if (itemFlag != null) addItemFlag(itemFlag);
 
             } catch (Exception ignored) {}
         }
@@ -869,9 +862,7 @@ public class ItemBuilder {
     }
     
     public ItemBuilder addItemFlag(ItemFlag itemFlag) {
-        if (itemFlag != null) {
-            itemFlags.add(itemFlag);
-        }
+        if (itemFlag != null) itemFlags.add(itemFlag);
 
         return this;
     }
@@ -886,9 +877,7 @@ public class ItemBuilder {
      * @return The result of all the info that was given to the builder as an ItemStack.
      */
     public ItemStack build() {
-        if (nbtItem != null) {
-            referenceItem = nbtItem.getItem();
-        }
+        if (nbtItem != null) referenceItem = nbtItem.getItem();
 
         ItemStack item = referenceItem != null ? referenceItem : new ItemStack(material);
 
@@ -915,22 +904,16 @@ public class ItemBuilder {
                 }
             }
 
-            if (ServerProtocol.isAtLeast(ServerProtocol.v1_10_R1)) {
-                itemMeta.setUnbreakable(unbreakable);
-            }
+            if (ServerProtocol.isAtLeast(ServerProtocol.v1_10_R1)) itemMeta.setUnbreakable(unbreakable);
 
             item.setDurability((short) damage);
 
             if (isPotion && (potionType != null || potionColor != null)) {
                 PotionMeta potionMeta = (PotionMeta) itemMeta;
 
-                if (potionType != null) {
-                    potionMeta.setBasePotionData(new PotionData(potionType));
-                }
+                if (potionType != null) potionMeta.setBasePotionData(new PotionData(potionType));
 
-                if (potionColor != null) {
-                    potionMeta.setColor(potionColor);
-                }
+                if (potionColor != null) potionMeta.setColor(potionColor);
             }
 
             if (isLeatherArmor && armorColor != null) {
@@ -959,15 +942,11 @@ public class ItemBuilder {
             NBTItem nbt = new NBTItem(item);
 
             if (isHead) {
-                if (!isHash && player != null && !player.equals("") && ServerProtocol.isAtLeast(ServerProtocol.v1_9_R1)) {
-                    nbt.setString("SkullOwner", player);
-                }
+                if (!isHash && player != null && !player.equals("") && ServerProtocol.isAtLeast(ServerProtocol.v1_9_R1)) nbt.setString("SkullOwner", player);
             }
 
             if (isMobEgg) {
-                if (entityType != null) {
-                    nbt.addCompound("EntityTag").setString("id", "minecraft:" + entityType.name());
-                }
+                if (entityType != null) nbt.addCompound("EntityTag").setString("id", "minecraft:" + entityType.name());
             }
 
             if (ServerProtocol.isOlder(ServerProtocol.v1_11_R1)) {
@@ -977,9 +956,7 @@ public class ItemBuilder {
                 }
             }
 
-            if (!crateName.isEmpty()) {
-                nbt.setString("CrazyCrates-Crate", crateName);
-            }
+            if (!crateName.isEmpty()) nbt.setString("CrazyCrates-Crate", crateName);
 
             return nbt.getItem();
         } else {
@@ -1015,9 +992,7 @@ public class ItemBuilder {
             try {
                 if (item != null) {
                     if (item.hasItemMeta()) {
-                        if (item.getItemMeta().hasEnchants()) {
-                            return item;
-                        }
+                        if (item.getItemMeta().hasEnchants()) return item;
                     }
 
                     item.addUnsafeEnchantment(Enchantment.LUCK, 1);
@@ -1192,5 +1167,4 @@ public class ItemBuilder {
         enchantments.put("LOYALTY", "Loyalty");
         return enchantments;
     }
-    
 }

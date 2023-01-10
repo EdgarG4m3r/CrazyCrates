@@ -1,5 +1,6 @@
 package me.badbones69.crazycrates.api.objects;
 
+import me.badbones69.crazycrates.CrazyCrates;
 import me.badbones69.crazycrates.Methods;
 import me.badbones69.crazycrates.api.CrazyManager;
 import me.badbones69.crazycrates.api.enums.KeyType;
@@ -23,8 +24,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.*;
 
 public class QuadCrateSession {
+
+    private static final CrazyCrates plugin = CrazyCrates.getPlugin();
+    private static final CrazyManager crazyManager = plugin.getCrazyManager();
     
-    private static final CrazyManager crazyManager = CrazyManager.getInstance();
     private static final NMSSupport nms = crazyManager.getNMSSupport();
     private static final List<QuadCrateSession> crateSessions = new ArrayList<>();
     private static final List<Material> blacklistBlocks = nms.getQuadCrateBlacklistBlocks();
@@ -72,9 +75,7 @@ public class QuadCrateSession {
     
     public static Boolean inSession(Player player) {
         for (QuadCrateSession session : crateSessions) {
-            if (session.getPlayer() == player) {
-                return true;
-            }
+            if (session.getPlayer() == player) return true;
         }
 
         return false;
@@ -82,9 +83,7 @@ public class QuadCrateSession {
     
     public static QuadCrateSession getSession(Player player) {
         for (QuadCrateSession session : crateSessions) {
-            if (session.getPlayer() == player) {
-                return session;
-            }
+            if (session.getPlayer() == player) return session;
         }
 
         return null;
@@ -133,6 +132,7 @@ public class QuadCrateSession {
                         return false;
                     }
                 }
+
                 shovePlayers.add(entity);
             }
         }
@@ -144,9 +144,7 @@ public class QuadCrateSession {
             return false;
         }
 
-        if (crazyManager.getHologramController() != null) {
-            crazyManager.getHologramController().removeHologram(spawnLocation.getBlock());
-        }
+        if (crazyManager.getHologramController() != null) crazyManager.getHologramController().removeHologram(spawnLocation.getBlock());
 
         player.teleport(spawnLocation.clone().add(.5, 0, .5));
 
@@ -162,11 +160,7 @@ public class QuadCrateSession {
 
         // Save the oldBlock states
         for (Location loc : schematicLocations) {
-            if (chestLocations.contains(loc)) {
-                oldChestBlocks.put(loc.clone(), loc.getBlock().getState());
-            } else {
-                oldBlocks.put(loc.clone(), loc.getBlock().getState());
-            }
+            if (chestLocations.contains(loc)) oldChestBlocks.put(loc.clone(), loc.getBlock().getState()); else oldBlocks.put(loc.clone(), loc.getBlock().getState());
         }
 
         nms.pasteSchematic(crateSchematic.getSchematicFile(), spawnLocation.clone());
@@ -203,7 +197,7 @@ public class QuadCrateSession {
                     }
                 } // 154 - 33
             }
-        }.runTaskTimer(crazyManager.getPlugin(), 0, 1));
+        }.runTaskTimer(plugin, 0, 1));
 
         crazyManager.addCrateTask(player, new BukkitRunnable() {
             @Override
@@ -211,7 +205,7 @@ public class QuadCrateSession {
                 endCrateForce(true);
                 player.sendMessage(Messages.OUT_OF_TIME.getMessage());
             }
-        }.runTaskLater(crazyManager.getPlugin(), crazyManager.getQuadCrateTimer()));
+        }.runTaskLater(plugin, crazyManager.getQuadCrateTimer()));
         return true;
     }
     
@@ -224,15 +218,13 @@ public class QuadCrateSession {
                 displayedRewards.forEach(Entity :: remove);
                 player.teleport(lastLocation);
 
-                if (crazyManager.getHologramController() != null) {
-                    crazyManager.getHologramController().createHologram(spawnLocation.getBlock(), crate);
-                }
+                if (crazyManager.getHologramController() != null) crazyManager.getHologramController().createHologram(spawnLocation.getBlock(), crate);
 
                 crazyManager.endCrate(player);
                 crazyManager.removePlayerFromOpeningList(player);
                 crateSessions.remove(instance);
             }
-        }.runTaskLater(crazyManager.getPlugin(), 3 * 20);
+        }.runTaskLater(plugin, 3 * 20);
     }
     
     public void endCrateForce(boolean removeFromSessions) {
@@ -242,9 +234,7 @@ public class QuadCrateSession {
         player.teleport(lastLocation);
         crazyManager.removePlayerFromOpeningList(player);
 
-        if (removeFromSessions) {
-            crateSessions.remove(instance);
-        }
+        if (removeFromSessions) crateSessions.remove(instance);
     }
     
     public Crate getCrate() {
@@ -286,9 +276,7 @@ public class QuadCrateSession {
     
     public Boolean allChestsOpened() {
         for (Map.Entry<Location, Boolean> location : chestsOpened.entrySet()) {
-            if (!location.getValue()) {
-                return false;
-            }
+            if (!location.getValue()) return false;
         }
 
         return true;
@@ -344,9 +332,7 @@ public class QuadCrateSession {
                 radius += expandingRadius;
             }
 
-            if (nextLocation == 10) {
-                nextLocation = 0;
-            }
+            if (nextLocation == 10) nextLocation = 0;
         }
 
         return locations;
@@ -378,9 +364,7 @@ public class QuadCrateSession {
                 radius += expandingRadius;
             }
 
-            if (nextLocation == 10) {
-                nextLocation = 0;
-            }
+            if (nextLocation == 10) nextLocation = 0;
         }
 
         return locations;
@@ -461,5 +445,4 @@ public class QuadCrateSession {
         state.setData(new Chest(blockFace));
         state.update();
     }
-    
 }

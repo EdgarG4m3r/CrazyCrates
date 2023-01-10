@@ -1,10 +1,9 @@
 package me.badbones69.crazycrates.multisupport;
 
-import me.badbones69.crazycrates.api.CrazyManager;
-import org.bukkit.Bukkit;
+import me.badbones69.crazycrates.CrazyCrates;
 
 /**
- * @Author Badbones69
+ * @author Badbones69
  */
 public enum ServerProtocol {
 
@@ -25,6 +24,8 @@ public enum ServerProtocol {
     private static ServerProtocol currentProtocol;
     private static ServerProtocol latest;
 
+    private static final CrazyCrates plugin = CrazyCrates.getPlugin();
+
     private final int versionProtocol;
 
     ServerProtocol(int versionProtocol) {
@@ -33,7 +34,7 @@ public enum ServerProtocol {
 
     public static ServerProtocol getCurrentProtocol() {
 
-        String serVer = Bukkit.getServer().getClass().getPackage().getName();
+        String serVer = plugin.getServer().getClass().getPackage().getName();
 
         int serProt = Integer.parseInt(
                 serVer.substring(
@@ -64,9 +65,7 @@ public enum ServerProtocol {
         ServerProtocol old = ServerProtocol.TOO_OLD;
 
         for (ServerProtocol protocol : values()) {
-            if (protocol.compare(old) == 1) {
-                old = protocol;
-            }
+            if (protocol.compare(old) == 1) old = protocol;
         }
 
         return old;
@@ -107,5 +106,4 @@ public enum ServerProtocol {
 
         return result;
     }
-
 }

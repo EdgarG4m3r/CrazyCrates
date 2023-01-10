@@ -1,5 +1,6 @@
 package me.badbones69.crazycrates.api.objects;
 
+import me.badbones69.crazycrates.CrazyCrates;
 import me.badbones69.crazycrates.Methods;
 import me.badbones69.crazycrates.api.CrazyManager;
 import me.badbones69.crazycrates.api.FileManager;
@@ -22,6 +23,10 @@ import java.util.List;
 import java.util.Random;
 
 public class Crate {
+
+    private final CrazyCrates plugin = CrazyCrates.getPlugin();
+    private final FileManager fileManager = plugin.getFileManager();
+    private final CrazyManager crazyManager = plugin.getCrazyManager();
     
     private CrateManager manager;
     private final String name;
@@ -44,10 +49,6 @@ public class Crate {
     private final ArrayList<ItemStack> preview;
     private final ArrayList<Tier> tiers;
     private final CrateHologram hologram;
-
-    private final FileManager fileManager = FileManager.getInstance();
-
-    private final CrazyManager crazyManager = CrazyManager.getInstance();
 
     /**
      *
@@ -85,9 +86,7 @@ public class Crate {
         this.hologram = hologram != null ? hologram : new CrateHologram();
 
         //TODO Add more managers for editing other crate types.
-        if (crateType == CrateType.COSMIC) {
-            this.manager = new CosmicCrateManager(file);
-        }
+        if (crateType == CrateType.COSMIC) this.manager = new CosmicCrateManager(file);
     }
     
     /**
@@ -104,9 +103,7 @@ public class Crate {
     public void setPreviewChestLines(int amount) {
         int finalAmount;
 
-        if (amount < 3 && borderToggle) {
-            finalAmount = 3;
-        } else finalAmount = Math.min(amount, 6);
+        if (amount < 3 && borderToggle) finalAmount = 3; else finalAmount = Math.min(amount, 6);
 
         this.previewChestLines = finalAmount;
     }
@@ -151,9 +148,7 @@ public class Crate {
         } else {
             for (Prize prize : getPrizes()) {
                 if (prize.hasBlacklistPermission(player)) {
-                    if (!prize.hasAltPrize()) {
-                        continue;
-                    }
+                    if (!prize.hasAltPrize()) continue;
                 }
 
                 useablePrizes.add(prize);
@@ -170,9 +165,7 @@ public class Crate {
                 for (int counter = 1; counter <= 1; counter++) {
                     num = 1 + new Random().nextInt(max);
 
-                    if (num >= 1 && num <= chance) {
-                        prizes.add(prize);
-                    }
+                    if (num >= 1 && num <= chance) prizes.add(prize);
                 }
             }
         }
@@ -180,7 +173,7 @@ public class Crate {
         try {
             return prizes.get(new Random().nextInt(prizes.size()));
         } catch (IllegalArgumentException e) {
-            crazyManager.getPlugin().getLogger().warning("Failed to find prize from the " + name + " crate for player " + player.getName() + ".");
+            plugin.getLogger().warning("Failed to find prize from the " + name + " crate for player " + player.getName() + ".");
             return null;
         }
     }
@@ -198,21 +191,15 @@ public class Crate {
         // ================= Blacklist Check ================= //
         if (player.isOp()) {
             for (Prize prize : getPrizes()) {
-                if (prize.getTiers().contains(tier)) {
-                    useablePrizes.add(prize);
-                }
+                if (prize.getTiers().contains(tier)) useablePrizes.add(prize);
             }
         } else {
             for (Prize prize : getPrizes()) {
                 if (prize.hasBlacklistPermission(player)) {
-                    if (!prize.hasAltPrize()) {
-                        continue;
-                    }
+                    if (!prize.hasAltPrize()) continue;
                 }
 
-                if (prize.getTiers().contains(tier)) {
-                    useablePrizes.add(prize);
-                }
+                if (prize.getTiers().contains(tier)) useablePrizes.add(prize);
             }
         }
 
@@ -225,9 +212,7 @@ public class Crate {
 
                 for (int counter = 1; counter <= 1; counter++) {
                     num = 1 + new Random().nextInt(max);
-                    if (num >= 1 && num <= chance) {
-                        prizes.add(prize);
-                    }
+                    if (num >= 1 && num <= chance) prizes.add(prize);
                 }
             }
         }
@@ -244,9 +229,7 @@ public class Crate {
     public Prize pickPrize(Player player, Location location) {
         Prize prize = pickPrize(player);
 
-        if (prize.useFireworks()) {
-            Methods.fireWork(location);
-        }
+        if (prize.useFireworks()) Methods.fireWork(location);
 
         return prize;
     }
@@ -348,17 +331,13 @@ public class Crate {
      * @return The preview as an Inventory object.
      */
     public Inventory getPreview(Player player, int page) {
-        Inventory inventory = crazyManager.getPlugin().getServer().createInventory(null, !borderToggle && (Preview.playerInMenu(player) || maxPage > 1) && maxSlots == 9 ? maxSlots + 9 : maxSlots, previewName);
+        Inventory inventory = plugin.getServer().createInventory(null, !borderToggle && (Preview.playerInMenu(player) || maxPage > 1) && maxSlots == 9 ? maxSlots + 9 : maxSlots, previewName);
         setDefaultItems(inventory, player);
 
         for (ItemStack item : getPageItems(page)) {
             int nextSlot = inventory.firstEmpty();
 
-            if (nextSlot >= 0) {
-                inventory.setItem(nextSlot, item);
-            } else {
-                break;
-            }
+            if (nextSlot >= 0) inventory.setItem(nextSlot, item); else break;
         }
 
         return inventory;
@@ -450,9 +429,7 @@ public class Crate {
      */
     public Prize getPrize(String name) {
         for (Prize prize : prizes) {
-            if (prize.getName().equalsIgnoreCase(name)) {
-                return prize;
-            }
+            if (prize.getName().equalsIgnoreCase(name)) return prize;
         }
 
         return null;
@@ -462,15 +439,11 @@ public class Crate {
         try {
             NBTItem nbt = new NBTItem(item);
 
-            if (nbt.hasKey("crazycrate-prize")) {
-                return getPrize(nbt.getString("crazycrate-prize"));
-            }
+            if (nbt.hasKey("crazycrate-prize")) return getPrize(nbt.getString("crazycrate-prize"));
         } catch (Exception ignored) {}
 
         for (Prize prize : prizes) {
-            if (item.isSimilar(prize.getDisplayItem())) {
-                return prize;
-            }
+            if (item.isSimilar(prize.getDisplayItem())) return prize;
         }
 
         return null;
@@ -512,9 +485,7 @@ public class Crate {
             NBTItem nbtItem = new NBTItem(item);
 
             if (nbtItem.hasNBTData()) {
-                if (nbtItem.hasKey("Unbreakable") && nbtItem.getBoolean("Unbreakable")) {
-                    file.set(path + ".Unbreakable", true);
-                }
+                if (nbtItem.hasKey("Unbreakable") && nbtItem.getBoolean("Unbreakable")) file.set(path + ".Unbreakable", true);
             }
 
             List<String> enchantments = new ArrayList<>();
@@ -523,9 +494,7 @@ public class Crate {
                 enchantments.add((crazyManager.useNewMaterial() ? enchantment.getKey().getKey() : enchantment.getName()) + ":" + item.getEnchantments().get(enchantment));
             }
 
-            if (!enchantments.isEmpty()) {
-                file.set(path + ".DisplayEnchantments", enchantments);
-            }
+            if (!enchantments.isEmpty()) file.set(path + ".DisplayEnchantments", enchantments);
 
             file.set(path + ".DisplayItem", crazyManager.useNewMaterial() ? item.getType().name() : item.getType().name() + ":" + item.getDurability());
             file.set(path + ".DisplayAmount", item.getAmount());
@@ -533,9 +502,7 @@ public class Crate {
             file.set(path + ".Chance", 50);
         } else {
             // Must be checked as getList will return null if nothing is found.
-            if (file.contains(path + ".Editor-Items")) {
-                file.getList(path + ".Editor-Items").forEach(listItem -> items.add((ItemStack) listItem));
-            }
+            if (file.contains(path + ".Editor-Items")) file.getList(path + ".Editor-Items").forEach(listItem -> items.add((ItemStack) listItem));
         }
 
         file.set(path + ".Editor-Items", items);
@@ -629,25 +596,18 @@ public class Crate {
 
         int page = Preview.getPage(player);
 
-        if (Preview.playerInMenu(player)) {
-            inventory.setItem(getAbsoluteItemPosition(4), Preview.getMenuButton());
-        }
+        if (Preview.playerInMenu(player)) inventory.setItem(getAbsoluteItemPosition(4), Preview.getMenuButton());
 
         if (page == 1) {
-            if (borderToggle) {
-                inventory.setItem(getAbsoluteItemPosition(3), boarderItem.build());
-            }
+            if (borderToggle) inventory.setItem(getAbsoluteItemPosition(3), boarderItem.build());
         } else {
             inventory.setItem(getAbsoluteItemPosition(3), Preview.getBackButton(player));
         }
 
         if (page == maxPage) {
-            if (borderToggle) {
-                inventory.setItem(getAbsoluteItemPosition(5), boarderItem.build());
-            }
+            if (borderToggle) inventory.setItem(getAbsoluteItemPosition(5), boarderItem.build());
         } else {
             inventory.setItem(getAbsoluteItemPosition(5), Preview.getNextButton(player));
         }
     }
-    
 }

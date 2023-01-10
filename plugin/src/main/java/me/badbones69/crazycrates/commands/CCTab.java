@@ -1,5 +1,6 @@
 package me.badbones69.crazycrates.commands;
 
+import me.badbones69.crazycrates.CrazyCrates;
 import me.badbones69.crazycrates.api.CrazyManager;
 import me.badbones69.crazycrates.api.enums.CrateType;
 import me.badbones69.crazycrates.api.objects.Crate;
@@ -12,8 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CCTab implements TabCompleter {
-    
-    private final CrazyManager crazyManager = CrazyManager.getInstance();
+
+    private final CrazyCrates plugin = CrazyCrates.getPlugin();
+    private final CrazyManager crazyManager = plugin.getCrazyManager();
     
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String commandLabel, String[] args) {
@@ -47,7 +49,6 @@ public class CCTab implements TabCompleter {
                         crazyManager.getCrates().forEach(crate -> completions.add(crate.getName()));
                         completions.remove("Menu"); // Takes out a crate that doesn't exist as a file.
                     }
-
                     break;
                 case "set":
                     if (hasPermission(sender, "set")) crazyManager.getCrates().forEach(crate -> completions.add(crate.getName()));
@@ -64,7 +65,6 @@ public class CCTab implements TabCompleter {
                         completions.add("virtual");
                         completions.add("v");
                     }
-
                     break;
                 case "save":
                     if (hasPermission(sender, "schematic")) completions.add("<Schematic Name>");
@@ -77,19 +77,13 @@ public class CCTab implements TabCompleter {
                 case "additem":
                     if (hasPermission(sender, "additem")) {
                         Crate crateFromName = crazyManager.getCrateFromName(args[1]);
-                        if (crateFromName != null && crateFromName.getCrateType() != CrateType.MENU) {
-                            crazyManager.getCrateFromName(args[1]).getPrizes().forEach(prize -> completions.add(prize.getName()));
-                        }
+                        if (crateFromName != null && crateFromName.getCrateType() != CrateType.MENU) crazyManager.getCrateFromName(args[1]).getPrizes().forEach(prize -> completions.add(prize.getName()));
                     }
-
                     break;
                 case "open":
                 case "forceopen":
                 case "transfer":
-                    if (hasPermission(sender, "forceopen") || hasPermission(sender, "open") || hasPermission(sender, "transfer")) {
-                        crazyManager.getPlugin().getServer().getOnlinePlayers().forEach(player -> completions.add(player.getName()));
-                    }
-
+                    if (hasPermission(sender, "forceopen") || hasPermission(sender, "open") || hasPermission(sender, "transfer")) plugin.getServer().getOnlinePlayers().forEach(player -> completions.add(player.getName()));
                     break;
                 case "give":
                 case "giveall":
@@ -98,7 +92,6 @@ public class CCTab implements TabCompleter {
                         crazyManager.getCrates().forEach(crate -> completions.add(crate.getName()));
                         completions.remove("Menu"); // Takes out a crate that doesn't exist as a file.
                     }
-
                     break;
             }
 
@@ -109,10 +102,7 @@ public class CCTab implements TabCompleter {
                 case "giveall":
                 case "take":
                 case "transfer":
-                    if (hasPermission(sender, "take") || hasPermission(sender, "giveall") || hasPermission(sender, "give") || hasPermission(sender, "transfer")) {
-                        for (int i = 1; i <= 100; i++) completions.add(i + "");
-                    }
-
+                    if (hasPermission(sender, "take") || hasPermission(sender, "giveall") || hasPermission(sender, "give") || hasPermission(sender, "transfer")) for (int i = 1; i <= 100; i++) completions.add(i + "");
                     break;
             }
 
@@ -122,10 +112,7 @@ public class CCTab implements TabCompleter {
                 case "give":
                 case "giveall":
                 case "take":
-                    if (hasPermission(sender, "take") || hasPermission(sender, "giveall") || hasPermission(sender, "give")) {
-                        crazyManager.getPlugin().getServer().getOnlinePlayers().forEach(player -> completions.add(player.getName()));
-                    }
-
+                    if (hasPermission(sender, "take") || hasPermission(sender, "giveall") || hasPermission(sender, "give")) plugin.getServer().getOnlinePlayers().forEach(player -> completions.add(player.getName()));
                     break;
             }
 
@@ -138,5 +125,4 @@ public class CCTab implements TabCompleter {
     private boolean hasPermission(CommandSender sender, String node) {
         return sender.hasPermission("crazycrates." + node) || sender.hasPermission("crazycrates.admin");
     }
-    
 }

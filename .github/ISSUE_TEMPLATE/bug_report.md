@@ -1,7 +1,7 @@
 ---
 name: Bug report
 about: Create a report to help us improve
-title: "[Bug Report] "
+title: "[Bug Report]"
 labels: ''
 assignees: ''
 
@@ -12,7 +12,7 @@ A clear and concise description of what the bug is.
 
 **Versions (please complete the following information):**
  - Minecraft Server Version: [e.g. 1.8.8]
- - Plugin Version: [e.g. 1.10]
+ - Plugin Version: [e.g. 1.10.2]
 
 *Do **NOT** say The Latest use `/version crazycrates` in the console.
 

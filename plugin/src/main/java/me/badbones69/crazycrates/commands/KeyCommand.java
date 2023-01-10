@@ -1,5 +1,6 @@
 package me.badbones69.crazycrates.commands;
 
+import me.badbones69.crazycrates.CrazyCrates;
 import me.badbones69.crazycrates.Methods;
 import me.badbones69.crazycrates.api.CrazyManager;
 import me.badbones69.crazycrates.api.enums.Messages;
@@ -14,8 +15,9 @@ import java.util.HashMap;
 import java.util.List;
 
 public class KeyCommand implements CommandExecutor {
-    
-    private final CrazyManager crazyManager = CrazyManager.getInstance();
+
+    private final CrazyCrates plugin = CrazyCrates.getPlugin();
+    private final CrazyManager crazyManager = plugin.getCrazyManager();
     
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String commandLabel, String[] args) {
@@ -23,9 +25,7 @@ public class KeyCommand implements CommandExecutor {
         // /key redeem <crate> [amount] << Will be added later.
         if (args.length == 0) {
             if (sender instanceof Player) {
-                if (!Methods.permCheck(sender, "access")) {
-                    return true;
-                }
+                if (!Methods.permCheck(sender, "access")) return true;
             } else {
                 sender.sendMessage(Messages.MUST_BE_A_PLAYER.getMessage());
                 return true;
@@ -58,9 +58,7 @@ public class KeyCommand implements CommandExecutor {
             return true;
         } else {
             if (sender instanceof Player) {
-                if (!Methods.permCheck(sender, "admin")) {
-                    return true;
-                }
+                if (!Methods.permCheck(sender, "admin")) return true;
             }
 
             String player = args[0];
@@ -90,5 +88,4 @@ public class KeyCommand implements CommandExecutor {
 
         return true;
     }
-    
 }

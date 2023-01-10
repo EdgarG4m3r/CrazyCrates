@@ -1,5 +1,6 @@
 package me.badbones69.crazycrates.controllers;
 
+import me.badbones69.crazycrates.CrazyCrates;
 import me.badbones69.crazycrates.api.CrazyManager;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -419,7 +420,7 @@ public enum ParticleEffect {
     private static final Map<String, ParticleEffect> NAME_MAP = new HashMap<>();
     private static final Map<Integer, ParticleEffect> ID_MAP = new HashMap<>();
 
-    private static CrazyManager crazyManager = CrazyManager.getInstance();
+    private static final CrazyCrates plugin = CrazyCrates.getPlugin();
     
     // Initialize map for quick name and id lookup
     static {
@@ -1649,7 +1650,7 @@ public enum ParticleEffect {
                     String worldName = center.getWorld().getName();
                     double squared = range * range;
 
-                    for (Player player : crazyManager.getPlugin().getServer().getOnlinePlayers()) {
+                    for (Player player : plugin.getServer().getOnlinePlayers()) {
 
                         if (!player.getWorld().getName().equals(worldName) || player.getLocation().distanceSquared(center) > squared) {
                             continue;

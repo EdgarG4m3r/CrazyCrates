@@ -1,5 +1,6 @@
 package me.badbones69.crazycrates.cratetypes;
 
+import me.badbones69.crazycrates.CrazyCrates;
 import me.badbones69.crazycrates.Methods;
 import me.badbones69.crazycrates.api.CrazyManager;
 import me.badbones69.crazycrates.api.enums.KeyType;
@@ -17,9 +18,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Wheel implements Listener {
+
+    private static final CrazyCrates plugin = CrazyCrates.getPlugin();
+    private static final CrazyManager crazyManager = plugin.getCrazyManager();
     
     public static final Map<Player, HashMap<Integer, ItemStack>> rewards = new HashMap<>();
-    private static final CrazyManager crazyManager = CrazyManager.getInstance();
     
     public static void startWheel(final Player player, Crate crate, KeyType keyType, boolean checkHand) {
         if (!crazyManager.takeKeys(1, player, crate, keyType, checkHand)) {
@@ -28,7 +31,7 @@ public class Wheel implements Listener {
             return;
         }
 
-        final Inventory inv = crazyManager.getPlugin().getServer().createInventory(null, 54, Methods.sanitizeColor(crate.getFile().getString("Crate.CrateName")));
+        final Inventory inv = plugin.getServer().createInventory(null, 54, Methods.sanitizeColor(crate.getFile().getString("Crate.CrateName")));
 
         for (int i = 0; i < 54; i++) {
             inv.setItem(i, new ItemBuilder().setMaterial("BLACK_STAINED_GLASS_PANE", "STAINED_GLASS_PANE:15").setName(" ").build());
@@ -92,9 +95,7 @@ public class Wheel implements Listener {
                         f++;
                     }
 
-                    if (full == timer + 47) {
-                        player.playSound(player.getLocation(), crazyManager.getSound("ENTITY_PLAYER_LEVELUP", "LEVEL_UP"), 1, 1);
-                    }
+                    if (full == timer + 47) player.playSound(player.getLocation(), crazyManager.getSound("ENTITY_PLAYER_LEVELUP", "LEVEL_UP"), 1, 1);
 
                     if (full >= timer + 47) {
                         slow++;
@@ -103,9 +104,7 @@ public class Wheel implements Listener {
                             ItemStack item = Methods.getRandomPaneColor().setName(" ").build();
 
                             for (int slot = 0; slot < 54; slot++) {
-                                if (!getBorder().contains(slot)) {
-                                    inv.setItem(slot, item);
-                                }
+                                if (!getBorder().contains(slot)) inv.setItem(slot, item);
                             }
 
                             slow = 0;
@@ -115,18 +114,14 @@ public class Wheel implements Listener {
                     if (full >= (timer + 55 + 47)) {
                         Prize prize = null;
 
-                        if (crazyManager.isInOpeningList(player)) {
-                            prize = crate.getPrize(rewards.get(player).get(slots.get(f)));
-                        }
+                        if (crazyManager.isInOpeningList(player)) prize = crate.getPrize(rewards.get(player).get(slots.get(f)));
 
                         if (prize != null) {
                             crazyManager.givePrize(player, prize);
 
-                            if (prize.useFireworks()) {
-                                Methods.fireWork(player.getLocation().add(0, 1, 0));
-                            }
+                            if (prize.useFireworks()) Methods.fireWork(player.getLocation().add(0, 1, 0));
 
-                            crazyManager.getPlugin().getServer().getPluginManager().callEvent(new PlayerPrizeEvent(player, crate, crate.getName(), prize));
+                            plugin.getServer().getPluginManager().callEvent(new PlayerPrizeEvent(player, crate, crate.getName(), prize));
                         } else {
                             player.sendMessage(Methods.getPrefix("&cNo prize was found, please report this issue if you think this is an error."));
                         }
@@ -147,7 +142,7 @@ public class Wheel implements Listener {
                     open = 0;
                 }
             }
-        }.runTaskTimer(crazyManager.getPlugin(), 1, 1));
+        }.runTaskTimer(plugin, 1, 1));
     }
     
     private static ArrayList<Integer> slowSpin() {
@@ -188,5 +183,4 @@ public class Wheel implements Listener {
         slots.add(12);
         return slots;
     }
-    
 }

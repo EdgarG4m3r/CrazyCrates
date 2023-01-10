@@ -1,5 +1,6 @@
 package me.badbones69.crazycrates.controllers;
 
+import me.badbones69.crazycrates.CrazyCrates;
 import me.badbones69.crazycrates.Methods;
 import me.badbones69.crazycrates.api.CrazyManager;
 import me.badbones69.crazycrates.api.FileManager;
@@ -23,13 +24,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GUIMenu implements Listener {
-    
-    private static final CrazyManager crazyManager = CrazyManager.getInstance();
+
+    private static final CrazyCrates plugin = CrazyCrates.getPlugin();
+    private static final CrazyManager crazyManager = plugin.getCrazyManager();
     
     public static void openGUI(Player player) {
         int size = FileManager.Files.CONFIG.getFile().getInt("Settings.InventorySize");
 
-        Inventory inv = crazyManager.getPlugin().getServer().createInventory(null, size, Methods.sanitizeColor(FileManager.Files.CONFIG.getFile().getString("Settings.InventoryName")));
+        Inventory inv = plugin.getServer().createInventory(null, size, Methods.sanitizeColor(FileManager.Files.CONFIG.getFile().getString("Settings.InventoryName")));
 
         if (FileManager.Files.CONFIG.getFile().contains("Settings.Filler.Toggle")) {
             if (FileManager.Files.CONFIG.getFile().getBoolean("Settings.Filler.Toggle")) {
@@ -86,30 +88,18 @@ public class GUIMenu implements Listener {
                         }
                     }
 
-                    if (option.contains("Glowing:")) {
-                        item.setGlowing(Boolean.parseBoolean(option.replace("Glowing:", "")));
-                    }
+                    if (option.contains("Glowing:")) item.setGlowing(Boolean.parseBoolean(option.replace("Glowing:", "")));
 
-                    if (option.contains("Player:")) {
-                        item.setPlayer(option.replaceAll("%player%", player.getName()));
-                    }
+                    if (option.contains("Player:")) item.setPlayer(option.replaceAll("%player%", player.getName()));
 
-                    if (option.contains("Slot:")) {
-                        slot = Integer.parseInt(option.replace("Slot:", ""));
-                    }
+                    if (option.contains("Slot:")) slot = Integer.parseInt(option.replace("Slot:", ""));
 
-                    if (option.contains("Unbreakable-Item")) {
-                        item.setUnbreakable(Boolean.parseBoolean(option.replace("Unbreakable-Item:", "")));
-                    }
+                    if (option.contains("Unbreakable-Item")) item.setUnbreakable(Boolean.parseBoolean(option.replace("Unbreakable-Item:", "")));
 
-                    if (option.contains("Hide-Item-Flags")) {
-                        item.hideItemFlags(Boolean.parseBoolean(option.replace("Hide-Item-Flags:", "")));
-                    }
+                    if (option.contains("Hide-Item-Flags")) item.hideItemFlags(Boolean.parseBoolean(option.replace("Hide-Item-Flags:", "")));
                 }
 
-                if (slot > size) {
-                    continue;
-                }
+                if (slot > size) continue;
 
                 slot--;
                 inv.setItem(slot, item.build());
@@ -124,9 +114,7 @@ public class GUIMenu implements Listener {
                     String path = "Crate.";
                     int slot = file.getInt(path + "Slot");
 
-                    if (slot > size) {
-                        continue;
-                    }
+                    if (slot > size) continue;
 
                     slot--;
                     inv.setItem(slot, new ItemBuilder()
@@ -156,9 +144,7 @@ public class GUIMenu implements Listener {
 
         if (inv != null) {
             for (Crate crate : crazyManager.getCrates()) {
-                if (crate.getCrateType() != CrateType.MENU && crate.isCrateMenu(e.getView())) {
-                    return;
-                }
+                if (crate.getCrateType() != CrateType.MENU && crate.isCrateMenu(e.getView())) return;
             }
 
             if (e.getView().getTitle().equals(Methods.sanitizeColor(config.getString("Settings.InventoryName")))) {
@@ -179,6 +165,7 @@ public class GUIMenu implements Listener {
                                     } else {
                                         player.sendMessage(Messages.PREVIEW_DISABLED.getMessage());
                                     }
+
                                     return;
                                 }
 
@@ -201,9 +188,7 @@ public class GUIMenu implements Listener {
                                 if (!hasKey) {
                                     if (config.contains("Settings.Need-Key-Sound")) {
                                         Sound sound = Sound.valueOf(config.getString("Settings.Need-Key-Sound"));
-                                        if (sound != null) {
-                                            player.playSound(player.getLocation(), sound, 1f, 1f);
-                                        }
+                                        if (sound != null) player.playSound(player.getLocation(), sound, 1f, 1f);
                                     }
 
                                     player.sendMessage(Messages.NO_VIRTUAL_KEY.getMessage());
@@ -234,5 +219,4 @@ public class GUIMenu implements Listener {
     private ArrayList<String> getDisabledWorlds() {
         return new ArrayList<>(FileManager.Files.CONFIG.getFile().getStringList("Settings.DisabledWorlds"));
     }
-    
 }

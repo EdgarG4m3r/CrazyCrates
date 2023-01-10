@@ -32,7 +32,8 @@ import java.util.regex.Pattern;
 
 public class Methods {
 
-    private static final CrazyManager crazyManager = CrazyManager.getInstance();
+    private static final CrazyCrates plugin = CrazyCrates.getPlugin();
+    private static final CrazyManager crazyManager = plugin.getCrazyManager();
     private static final Random random = new Random();
 
     public final static Pattern HEX_PATTERN = Pattern.compile("#[a-fA-F\\d]{6}");
@@ -95,7 +96,7 @@ public class Methods {
         fm.setPower(0);
         fw.setFireworkMeta(fm);
         FireworkDamageEvent.addFirework(fw);
-        crazyManager.getPlugin().getServer().getScheduler().scheduleSyncDelayedTask(crazyManager.getPlugin(), fw :: detonate, 2);
+        plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, fw :: detonate, 2);
     }
 
     public static boolean isInt(String s) {
@@ -108,11 +109,11 @@ public class Methods {
     }
 
     public static Player getPlayer(String name) {
-        return crazyManager.getPlugin().getServer().getPlayerExact(name);
+        return plugin.getServer().getPlayerExact(name);
     }
 
     public static boolean isOnline(String name, CommandSender sender) {
-        for (Player player : crazyManager.getPlugin().getServer().getOnlinePlayers()) {
+        for (Player player : plugin.getServer().getOnlinePlayers()) {
             if (player.getName().equalsIgnoreCase(name)) {
                 return true;
             }
@@ -158,7 +159,7 @@ public class Methods {
     }
 
     public static List<Location> getLocations(String shem, Location loc) {
-        return crazyManager.getNMSSupport().getLocations(new File(crazyManager.getPlugin().getDataFolder() + "/Schematics/" + shem), loc);
+        return crazyManager.getNMSSupport().getLocations(new File(plugin.getDataFolder() + "/Schematics/" + shem), loc);
     }
 
     public static boolean isInventoryFull(Player player) {
@@ -368,9 +369,9 @@ public class Methods {
     }
 
     public static void failedToTakeKey(Player player, Crate crate, Exception e) {
-        crazyManager.getPlugin().getServer().getLogger().warning("An error has occurred while trying to take a physical key from a player");
-        crazyManager.getPlugin().getServer().getLogger().warning("Player: " + player.getName());
-        crazyManager.getPlugin().getServer().getLogger().warning("Crate: " + crate.getName());
+        plugin.getServer().getLogger().warning("An error has occurred while trying to take a physical key from a player");
+        plugin.getServer().getLogger().warning("Player: " + player.getName());
+        plugin.getServer().getLogger().warning("Crate: " + crate.getName());
 
         player.sendMessage(Methods.getPrefix("&cAn issue has occurred when trying to take a key and so the crate failed to open."));
 

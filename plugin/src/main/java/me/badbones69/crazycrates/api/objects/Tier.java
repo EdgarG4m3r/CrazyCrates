@@ -69,5 +69,4 @@ public class Tier {
     public ItemStack getTierPane() {
         return colorGlass.build();
     }
-    
 }

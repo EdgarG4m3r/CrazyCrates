@@ -1,5 +1,6 @@
 package me.badbones69.crazycrates.cratetypes;
 
+import me.badbones69.crazycrates.CrazyCrates;
 import me.badbones69.crazycrates.Methods;
 import me.badbones69.crazycrates.api.CrazyManager;
 import me.badbones69.crazycrates.api.enums.CrateType;
@@ -21,16 +22,18 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.HashMap;
 
 public class War implements Listener {
+
+    private static final CrazyCrates plugin = CrazyCrates.getPlugin();
+    private static final CrazyManager crazyManager = plugin.getCrazyManager();
     
     private static final String crateNameString = "Crate.CrateName";
-    private static final CrazyManager crazyManager = CrazyManager.getInstance();
     private static HashMap<ItemStack, String> colorCodes;
     private static final HashMap<Player, Boolean> canPick = new HashMap<>();
     private static final HashMap<Player, Boolean> canClose = new HashMap<>();
     
     public static void openWarCrate(Player player, Crate crate, KeyType keyType, boolean checkHand) {
         String crateName = Methods.sanitizeColor(crate.getFile().getString(crateNameString));
-        Inventory inv = crazyManager.getPlugin().getServer().createInventory(null, 9, crateName);
+        Inventory inv = plugin.getServer().createInventory(null, 9, crateName);
         setRandomPrizes(player, inv, crate, crateName);
         InventoryView inventoryView = player.openInventory(inv);
         canPick.put(player, false);
@@ -72,7 +75,7 @@ public class War implements Listener {
                     canPick.put(player, true);
                 }
             }
-        }.runTaskTimer(crazyManager.getPlugin(), 1, 3));
+        }.runTaskTimer(plugin, 1, 3));
     }
     
     private static void setRandomPrizes(Player player, Inventory inv, Crate crate, String inventoryTitle) {
@@ -85,9 +88,7 @@ public class War implements Listener {
     
     private static void setRandomGlass(Player player, Inventory inv, String inventoryTitle) {
         if (crazyManager.isInOpeningList(player) && inventoryTitle.equalsIgnoreCase(Methods.sanitizeColor(crazyManager.getOpeningCrate(player).getFile().getString(crateNameString)))) {
-            if (colorCodes == null) {
-                colorCodes = getColorCode();
-            }
+            if (colorCodes == null) colorCodes = getColorCode();
 
             ItemBuilder itemBuilder = Methods.getRandomPaneColor();
             itemBuilder.setName("&" + colorCodes.get(itemBuilder.build()) + "&l???");
@@ -136,19 +137,15 @@ public class War implements Listener {
                     Prize prize = crate.pickPrize(player);
                     inv.setItem(slot, prize.getDisplayItem());
 
-                    if (crazyManager.hasCrateTask(player)) {
-                        crazyManager.endCrate(player);
-                    }
+                    if (crazyManager.hasCrateTask(player)) crazyManager.endCrate(player);
 
                     canPick.remove(player);
                     canClose.put(player, true);
                     crazyManager.givePrize(player, prize);
 
-                    if (prize.useFireworks()) {
-                        Methods.fireWork(player.getLocation().add(0, 1, 0));
-                    }
+                    if (prize.useFireworks()) Methods.fireWork(player.getLocation().add(0, 1, 0));
 
-                    crazyManager.getPlugin().getServer().getPluginManager().callEvent(new PlayerPrizeEvent(player, crate, crate.getName(), prize));
+                    plugin.getServer().getPluginManager().callEvent(new PlayerPrizeEvent(player, crate, crate.getName(), prize));
                     crazyManager.removePlayerFromOpeningList(player);
 
                     player.playSound(player.getLocation(), crazyManager.getSound("BLOCK_ANVIL_PLACE", "ANVIL_LAND"), 1, 1);
@@ -163,39 +160,31 @@ public class War implements Listener {
                                 }
                             }
 
-                            if (crazyManager.hasCrateTask(player)) {
-                                crazyManager.endCrate(player);
-                            }
+                            if (crazyManager.hasCrateTask(player)) crazyManager.endCrate(player);
 
                             // Removing other items then the prize.
                             crazyManager.addCrateTask(player, new BukkitRunnable() {
                                 @Override
                                 public void run() {
                                     for (int i = 0; i < 9; i++) {
-                                        if (i != slot) {
-                                            inv.setItem(i, new ItemStack(Material.AIR));
-                                        }
+                                        if (i != slot) inv.setItem(i, new ItemStack(Material.AIR));
                                     }
 
-                                    if (crazyManager.hasCrateTask(player)) {
-                                        crazyManager.endCrate(player);
-                                    }
+                                    if (crazyManager.hasCrateTask(player)) crazyManager.endCrate(player);
 
                                     // Closing the inventory when finished.
                                     crazyManager.addCrateTask(player, new BukkitRunnable() {
                                         @Override
                                         public void run() {
-                                            if (crazyManager.hasCrateTask(player)) {
-                                                crazyManager.endCrate(player);
-                                            }
+                                            if (crazyManager.hasCrateTask(player)) crazyManager.endCrate(player);
 
                                             player.closeInventory();
                                         }
-                                    }.runTaskLater(crazyManager.getPlugin(), 30));
+                                    }.runTaskLater(plugin, 30));
                                 }
-                            }.runTaskLater(crazyManager.getPlugin(), 30));
+                            }.runTaskLater(plugin, 30));
                         }
-                    }.runTaskLater(crazyManager.getPlugin(), 30));
+                    }.runTaskLater(plugin, 30));
                 }
             }
         }
@@ -210,12 +199,9 @@ public class War implements Listener {
                 if (crate.getCrateType() == CrateType.WAR && e.getView().getTitle().equalsIgnoreCase(Methods.sanitizeColor(crate.getFile().getString(crateNameString)))) {
 
                     canClose.remove(player);
-                    if (crazyManager.hasCrateTask(player)) {
-                        crazyManager.endCrate(player);
-                    }
+                    if (crazyManager.hasCrateTask(player)) crazyManager.endCrate(player);
                 }
             }
         }
     }
-    
 }

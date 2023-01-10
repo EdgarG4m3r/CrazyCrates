@@ -1,5 +1,6 @@
 package me.badbones69.crazycrates.api;
 
+import me.badbones69.crazycrates.CrazyCrates;
 import me.badbones69.crazycrates.multisupport.ServerProtocol;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -14,8 +15,7 @@ import java.util.logging.Level;
 
 public class FileManager {
     
-    private static final FileManager instance = new FileManager();
-    private static final CrazyManager crazyManager = new CrazyManager();
+    private final CrazyCrates plugin = CrazyCrates.getPlugin();
 
     private boolean log = false;
 
@@ -26,14 +26,10 @@ public class FileManager {
     private final HashMap<String, String> autoGenerateFiles = new HashMap<>();
     private final HashMap<Files, FileConfiguration> configurations = new HashMap<>();
     
-    public static FileManager getInstance() {
-        return instance;
-    }
-    
     /**
      * Sets up the plugin and loads all necessary files.
      */
-    public FileManager setup(JavaPlugin plugin) {
+    public FileManager setup() {
         if (!plugin.getDataFolder().exists()) plugin.getDataFolder().mkdirs();
 
         files.clear();
@@ -231,7 +227,7 @@ public class FileManager {
         try {
             configurations.get(file).save(files.get(file));
         } catch (IOException e) {
-            crazyManager.getPlugin().getLogger().warning("Could not save " + file.getFileName() + "!");
+            plugin.getLogger().warning("Could not save " + file.getFileName() + "!");
             e.printStackTrace();
         }
     }
@@ -247,16 +243,16 @@ public class FileManager {
         if (file != null) {
 
             try {
-                file.getFile().save(new File(crazyManager.getPlugin().getDataFolder(), file.getHomeFolder() + "/" + file.getFileName()));
+                file.getFile().save(new File(plugin.getDataFolder(), file.getHomeFolder() + "/" + file.getFileName()));
 
-                if (log) crazyManager.getPlugin().getLogger().info("Successfully saved the " + file.getFileName() + ".");
+                if (log) plugin.getLogger().info("Successfully saved the " + file.getFileName() + ".");
             } catch (Exception e) {
-                crazyManager.getPlugin().getLogger().warning("Could not save " + file.getFileName() + "!");
+                plugin.getLogger().warning("Could not save " + file.getFileName() + "!");
                 e.printStackTrace();
             }
 
         } else {
-            if (log) crazyManager.getPlugin().getLogger().warning("The file " + name + ".yml could not be found!");
+            if (log) plugin.getLogger().warning("The file " + name + ".yml could not be found!");
         }
     }
     
@@ -286,16 +282,16 @@ public class FileManager {
         if (file != null) {
 
             try {
-                file.file = YamlConfiguration.loadConfiguration(new File(crazyManager.getPlugin().getDataFolder(), "/" + file.getHomeFolder() + "/" + file.getFileName()));
+                file.file = YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder(), "/" + file.getHomeFolder() + "/" + file.getFileName()));
 
-                if (log) crazyManager.getPlugin().getLogger().info("Successfully reload the " + file.getFileName() + ".");
+                if (log) plugin.getLogger().info("Successfully reload the " + file.getFileName() + ".");
             } catch (Exception e) {
-                crazyManager.getPlugin().getLogger().warning("Could not reload the " + file.getFileName() + "!");
+                plugin.getLogger().warning("Could not reload the " + file.getFileName() + "!");
                 e.printStackTrace();
             }
 
         } else {
-            if (log) crazyManager.getPlugin().getLogger().log(Level.WARNING, "The file " + name + ".yml could not be found!");
+            if (log) plugin.getLogger().log(Level.WARNING, "The file " + name + ".yml could not be found!");
         }
     }
     
@@ -390,8 +386,11 @@ public class FileManager {
          * @param oldFileJar The location of the 1.12.2- file version in the jar.
          */
         Files(String fileName, String fileLocation, String newFileJar, String oldFileJar) {
-            this(fileName, fileLocation, ServerProtocol.getCurrentProtocol().isNewer(ServerProtocol.v1_12_R1) ? newFileJar : oldFileJar);
+            this(fileName, fileLocation, ServerProtocol.isNewer(ServerProtocol.v1_12_R1) ? newFileJar : oldFileJar);
         }
+
+        private final CrazyCrates plugin = CrazyCrates.getPlugin();
+        private final FileManager fileManager = plugin.getFileManager();
         
         /**
          * Get the name of the file.
@@ -426,21 +425,21 @@ public class FileManager {
          * @return The file from the system.
          */
         public FileConfiguration getFile() {
-            return getInstance().getFile(this);
+            return fileManager.getFile(this);
         }
         
         /**
          * Saves the file from the loaded state to the file system.
          */
         public void saveFile() {
-            getInstance().saveFile(this);
+            fileManager.saveFile(this);
         }
         
         /**
          * Overrides the loaded state file and loads the file systems file.
          */
         public void reloadFile() {
-            getInstance().reloadFile(this);
+            fileManager.reloadFile(this);
         }
     }
     

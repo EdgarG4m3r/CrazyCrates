@@ -12,7 +12,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class DecentHologramsSupport implements HologramController {
     
-    private static final HashMap<Block, Hologram> holograms = new HashMap<>();
+    private final HashMap<Block, Hologram> holograms = new HashMap<>();
     
     public void createHologram(Block block, Crate crate) {
         CrateHologram crateHologram = crate.getHologram();

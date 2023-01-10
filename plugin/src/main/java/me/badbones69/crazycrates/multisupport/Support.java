@@ -1,5 +1,6 @@
 package me.badbones69.crazycrates.multisupport;
 
+import me.badbones69.crazycrates.CrazyCrates;
 import me.badbones69.crazycrates.api.CrazyManager;
 
 public enum Support {
@@ -11,6 +12,8 @@ public enum Support {
     DECENT_HOLOGRAMS("DecentHolograms");
     
     private final String name;
+
+    private final CrazyCrates plugin = CrazyCrates.getPlugin();
     
     Support(String name) {
         this.name = name;
@@ -21,7 +24,8 @@ public enum Support {
     }
     
     public boolean isPluginLoaded() {
-        return CrazyManager.getInstance().getPlugin().getServer().getPluginManager().getPlugin(name) != null;
+        if (plugin.getServer().getPluginManager().getPlugin(name) != null) return plugin.isEnabled();
+
+        return false;
     }
-    
 }

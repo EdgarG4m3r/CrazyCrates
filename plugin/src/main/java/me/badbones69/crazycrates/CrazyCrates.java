@@ -43,16 +43,18 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class CrazyCrates extends JavaPlugin implements Listener {
 
-    private final CrazyManager crazyManager = CrazyManager.getInstance();
-
-    private final FileManager fileManager = CrazyManager.getFileManager();
-
     private boolean isEnabled = true; // If the server is supported
 
-    private final JavaPlugin plugin = this;
+    private static CrazyCrates plugin;
+
+    private FileManager fileManager;
+
+    private CrazyManager crazyManager;
     
     @Override
     public void onEnable() {
+        plugin = this;
+
         if (ServerProtocol.isNewer(ServerProtocol.v1_16_R3)) {
             getLogger().warning("This jar only works on 1.16.X & below.");
             isEnabled = false;
@@ -61,8 +63,8 @@ public class CrazyCrates extends JavaPlugin implements Listener {
             return;
         }
 
-        // Initialize the plugin variable.
-        crazyManager.loadPlugin(this);
+        fileManager = new FileManager();
+        crazyManager = new CrazyManager();
 
         // Crate Files
         String extensions = ServerProtocol.isNewer(ServerProtocol.v1_12_R1) ? "nbt" : "schematic";
@@ -84,7 +86,7 @@ public class CrazyCrates extends JavaPlugin implements Listener {
                 //Register all files inside the custom folders.
                 .registerCustomFilesFolder("/Crates")
                 .registerCustomFilesFolder("/Schematics")
-                .setup(this);
+                .setup();
 
         if (!Files.LOCATIONS.getFile().contains("Locations")) {
             Files.LOCATIONS.getFile().set("Locations.Clear", null);
@@ -102,39 +104,29 @@ public class CrazyCrates extends JavaPlugin implements Listener {
 
         PluginManager pluginManager = getServer().getPluginManager();
 
-        pluginManager.registerEvents(this, plugin);
-        pluginManager.registerEvents(new GUIMenu(), plugin);
-        pluginManager.registerEvents(new Preview(), plugin);
-        pluginManager.registerEvents(new QuadCrate(), plugin);
-        pluginManager.registerEvents(new War(), plugin);
-        pluginManager.registerEvents(new CSGO(), plugin);
-        pluginManager.registerEvents(new Wheel(), plugin);
-        pluginManager.registerEvents(new Wonder(), plugin);
-        pluginManager.registerEvents(new Cosmic(), plugin);
-        pluginManager.registerEvents(new Roulette(), plugin);
-        pluginManager.registerEvents(new QuickCrate(), plugin);
-        pluginManager.registerEvents(new CrateControl(), plugin);
-        pluginManager.registerEvents(new CrateOnTheGo(), plugin);
+        pluginManager.registerEvents(this, this);
+        pluginManager.registerEvents(new GUIMenu(), this);
+        pluginManager.registerEvents(new Preview(), this);
+        pluginManager.registerEvents(new QuadCrate(), this);
+        pluginManager.registerEvents(new War(), this);
+        pluginManager.registerEvents(new CSGO(), this);
+        pluginManager.registerEvents(new Wheel(), this);
+        pluginManager.registerEvents(new Wonder(), this);
+        pluginManager.registerEvents(new Cosmic(), this);
+        pluginManager.registerEvents(new Roulette(), this);
+        pluginManager.registerEvents(new QuickCrate(), this);
+        pluginManager.registerEvents(new CrateControl(), this);
+        pluginManager.registerEvents(new CrateOnTheGo(), this);
 
-        if (ServerProtocol.isAtLeast(ServerProtocol.v1_12_R1)) {
-            pluginManager.registerEvents(new Events_v1_12_R1_Up(), plugin);
-        } else {
-            pluginManager.registerEvents(new Events_v1_11_R1_Down(), plugin);
-        }
+        if (ServerProtocol.isAtLeast(ServerProtocol.v1_12_R1)) pluginManager.registerEvents(new Events_v1_12_R1_Up(), this); else pluginManager.registerEvents(new Events_v1_11_R1_Down(), this);
 
-        if (!crazyManager.getBrokeCrateLocations().isEmpty()) {
-            pluginManager.registerEvents(new BrokeLocationsControl(), plugin);
-        }
+        if (!crazyManager.getBrokeCrateLocations().isEmpty()) pluginManager.registerEvents(new BrokeLocationsControl(), this);
 
-        pluginManager.registerEvents(new FireworkDamageEvent(), plugin);
+        pluginManager.registerEvents(new FireworkDamageEvent(), this);
 
-        if (Support.PLACEHOLDERAPI.isPluginLoaded()) {
-            new PlaceholderAPISupport().register();
-        }
+        if (Support.PLACEHOLDERAPI.isPluginLoaded()) new PlaceholderAPISupport().register();
 
-        if (Support.MVDWPLACEHOLDERAPI.isPluginLoaded()) {
-            MVdWPlaceholderAPISupport.registerPlaceholders(plugin);
-        }
+        if (Support.MVDWPLACEHOLDERAPI.isPluginLoaded()) MVdWPlaceholderAPISupport.registerPlaceholders();
 
         FileConfiguration config = Files.CONFIG.getFile();
 
@@ -167,9 +159,7 @@ public class CrazyCrates extends JavaPlugin implements Listener {
             QuadCrateSession.endAllCrates();
             QuickCrate.removeAllRewards();
 
-            if (crazyManager.getHologramController() != null) {
-                crazyManager.getHologramController().removeAllHolograms();
-            }
+            if (crazyManager.getHologramController() != null) crazyManager.getHologramController().removeAllHolograms();
         }
     }
     
@@ -178,5 +168,17 @@ public class CrazyCrates extends JavaPlugin implements Listener {
         Player player = e.getPlayer();
         crazyManager.setNewPlayerKeys(player);
         crazyManager.loadOfflinePlayersKeys(player);
+    }
+
+    public static CrazyCrates getPlugin() {
+        return plugin;
+    }
+
+    public FileManager getFileManager() {
+        return fileManager;
+    }
+
+    public CrazyManager getCrazyManager() {
+        return crazyManager;
     }
 }

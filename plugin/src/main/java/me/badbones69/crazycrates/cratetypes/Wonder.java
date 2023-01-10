@@ -1,5 +1,6 @@
 package me.badbones69.crazycrates.cratetypes;
 
+import me.badbones69.crazycrates.CrazyCrates;
 import me.badbones69.crazycrates.Methods;
 import me.badbones69.crazycrates.api.CrazyManager;
 import me.badbones69.crazycrates.api.enums.KeyType;
@@ -15,8 +16,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.ArrayList;
 
 public class Wonder implements Listener {
-    
-    private static final CrazyManager crazyManager = CrazyManager.getInstance();
+
+    private static final CrazyCrates plugin = CrazyCrates.getPlugin();
+    private static final CrazyManager crazyManager = plugin.getCrazyManager();
     
     public static void startWonder(final Player player, Crate crate, KeyType keyType, boolean checkHand) {
         if (!crazyManager.takeKeys(1, player, crate, keyType, checkHand)) {
@@ -25,7 +27,7 @@ public class Wonder implements Listener {
             return;
         }
 
-        final Inventory inv = crazyManager.getPlugin().getServer().createInventory(null, 45, crate.getCrateInventoryName());
+        final Inventory inv = plugin.getServer().createInventory(null, 45, crate.getCrateInventoryName());
         final ArrayList<String> slots = new ArrayList<>();
 
         for (int i = 0; i < 45; i++) {
@@ -36,7 +38,7 @@ public class Wonder implements Listener {
 
         player.openInventory(inv);
         crazyManager.addCrateTask(player, new BukkitRunnable() {
-            int fulltime = 0;
+            int fullTime = 0;
             int timer = 0;
             int slot1 = 0;
             int slot2 = 44;
@@ -45,7 +47,7 @@ public class Wonder implements Listener {
             
             @Override
             public void run() {
-                if (timer >= 2 && fulltime <= 65) {
+                if (timer >= 2 && fullTime <= 65) {
                     slots.remove(slot1 + "");
                     slots.remove(slot2 + "");
                     Slots.add(slot1);
@@ -61,7 +63,7 @@ public class Wonder implements Listener {
                     slot2--;
                 }
 
-                if (fulltime > 67) {
+                if (fullTime > 67) {
                     ItemStack item = Methods.getRandomPaneColor().setName(" ").build();
 
                     for (int slot : Slots) {
@@ -71,28 +73,25 @@ public class Wonder implements Listener {
 
                 player.openInventory(inv);
 
-                if (fulltime > 100) {
+                if (fullTime > 100) {
                     crazyManager.endCrate(player);
                     player.closeInventory();
                     crazyManager.givePrize(player, prize);
 
-                    if (prize.useFireworks()) {
-                        Methods.fireWork(player.getLocation().add(0, 1, 0));
-                    }
+                    if (prize.useFireworks()) Methods.fireWork(player.getLocation().add(0, 1, 0));
 
-                    crazyManager.getPlugin().getServer().getPluginManager().callEvent(new PlayerPrizeEvent(player, crate, crate.getName(), prize));
+                    plugin.getServer().getPluginManager().callEvent(new PlayerPrizeEvent(player, crate, crate.getName(), prize));
                     crazyManager.removePlayerFromOpeningList(player);
                     return;
                 }
 
-                fulltime++;
+                fullTime++;
                 timer++;
 
                 if (timer > 2) {
                     timer = 0;
                 }
             }
-        }.runTaskTimer(crazyManager.getPlugin(), 0, 2));
+        }.runTaskTimer(plugin, 0, 2));
     }
-    
 }

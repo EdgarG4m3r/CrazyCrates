@@ -3,7 +3,6 @@ package me.badbones69.crazycrates.api.enums;
 import me.badbones69.crazycrates.Methods;
 import me.badbones69.crazycrates.api.FileManager;
 import org.bukkit.configuration.file.FileConfiguration;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -124,9 +123,7 @@ public enum Messages {
             }
         }
 
-        if (saveFile) {
-            FileManager.Files.MESSAGES.saveFile();
-        }
+        if (saveFile) FileManager.Files.MESSAGES.saveFile();
     }
     
     public static String replacePlaceholders(String placeholder, String replacement, String message) {
@@ -253,5 +250,4 @@ public enum Messages {
     private List<String> getDefaultListMessage() {
         return defaultListMessage;
     }
-    
 }

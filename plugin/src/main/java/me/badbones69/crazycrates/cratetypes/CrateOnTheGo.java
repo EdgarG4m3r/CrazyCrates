@@ -1,5 +1,6 @@
 package me.badbones69.crazycrates.cratetypes;
 
+import me.badbones69.crazycrates.CrazyCrates;
 import me.badbones69.crazycrates.Methods;
 import me.badbones69.crazycrates.api.CrazyManager;
 import me.badbones69.crazycrates.api.enums.CrateType;
@@ -15,8 +16,9 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class CrateOnTheGo implements Listener {
-    
-    private static final CrazyManager crazyManager = CrazyManager.getInstance();
+
+    private static final CrazyCrates plugin = CrazyCrates.getPlugin();
+    private static final CrazyManager crazyManager = plugin.getCrazyManager();
     
     @EventHandler
     public void onCrateOpen(PlayerInteractEvent e) {
@@ -35,16 +37,13 @@ public class CrateOnTheGo implements Listener {
                     Prize prize = crate.pickPrize(player);
                     crazyManager.givePrize(player, prize);
 
-                    crazyManager.getPlugin().getServer().getPluginManager().callEvent(new PlayerPrizeEvent(player, crate, crazyManager.getOpeningCrate(player).getName(), prize));
+                    plugin.getServer().getPluginManager().callEvent(new PlayerPrizeEvent(player, crate, crazyManager.getOpeningCrate(player).getName(), prize));
 
-                    if (prize.useFireworks()) {
-                        Methods.fireWork(player.getLocation().add(0, 1, 0));
-                    }
+                    if (prize.useFireworks()) Methods.fireWork(player.getLocation().add(0, 1, 0));
 
                     crazyManager.removePlayerFromOpeningList(player);
                 }
             }
         }
     }
-
 }

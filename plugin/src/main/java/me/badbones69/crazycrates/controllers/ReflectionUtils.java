@@ -1,7 +1,6 @@
 package me.badbones69.crazycrates.controllers;
 
-import me.badbones69.crazycrates.api.CrazyManager;
-
+import me.badbones69.crazycrates.CrazyCrates;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -30,7 +29,7 @@ public final class ReflectionUtils {
     // Prevent accidental construction
     private ReflectionUtils() {}
 
-    private final static CrazyManager crazyManager = CrazyManager.getInstance();
+    private static final CrazyCrates plugin = CrazyCrates.getPlugin();
     
     /**
      * Returns the constructor of a given class with the given parameter types
@@ -406,7 +405,7 @@ public final class ReflectionUtils {
          * @return The server version
          */
         public static String getServerVersion() {
-            return crazyManager.getPlugin().getServer().getClass().getPackage().getName().substring(23);
+            return plugin.getServer().getClass().getPackage().getName().substring(23);
         }
         
         /**

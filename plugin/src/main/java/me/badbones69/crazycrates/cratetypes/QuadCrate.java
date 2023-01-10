@@ -1,5 +1,6 @@
 package me.badbones69.crazycrates.cratetypes;
 
+import me.badbones69.crazycrates.CrazyCrates;
 import me.badbones69.crazycrates.api.CrazyManager;
 import me.badbones69.crazycrates.api.enums.Messages;
 import me.badbones69.crazycrates.api.objects.Crate;
@@ -31,8 +32,9 @@ import java.util.Random;
  * Display items are controlled from the quick crate due to them using nbt tags.
  */
 public class QuadCrate implements Listener {
-    
-    private final CrazyManager crazyManager = CrazyManager.getInstance();
+
+    private static final CrazyCrates plugin = CrazyCrates.getPlugin();
+    private static final CrazyManager crazyManager = plugin.getCrazyManager();
     private final NMSSupport nms = crazyManager.getNMSSupport();
     
     @EventHandler
@@ -67,7 +69,7 @@ public class QuadCrate implements Listener {
                         nbtItem.setBoolean("crazycrates-item", true);
                         item = nbtItem.getItem();
                         Item reward = player.getWorld().dropItem(block.getLocation().add(.5, 1, .5), item);
-                        reward.setMetadata("betterdrops_ignore", new FixedMetadataValue(crazyManager.getPlugin(), true));
+                        reward.setMetadata("betterdrops_ignore", new FixedMetadataValue(plugin, true));
                         reward.setVelocity(new Vector(0, .2, 0));
                         reward.setCustomName(prize.getDisplayItem().getItemMeta().getDisplayName());
                         reward.setCustomNameVisible(true);
@@ -82,7 +84,7 @@ public class QuadCrate implements Listener {
                                     session.endCrate();
                                     player.playSound(player.getLocation(), crazyManager.getSound("BLOCK_STONE_STEP", "STEP_STONE"), 1, 1);
                                 }
-                            }.runTaskLater(crazyManager.getPlugin(), 60);
+                            }.runTaskLater(plugin, 60);
                         }
                     }
                 }
@@ -155,9 +157,6 @@ public class QuadCrate implements Listener {
     public void onLeave(PlayerQuitEvent e) {
         Player player = e.getPlayer();
 
-        if (QuadCrateSession.inSession(player)) {
-            QuadCrateSession.getSession(player).endCrate();
-        }
+        if (QuadCrateSession.inSession(player)) QuadCrateSession.getSession(player).endCrate();
     }
-    
 }
