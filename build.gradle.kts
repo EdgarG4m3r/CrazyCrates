@@ -13,7 +13,7 @@ allprojects {
         /** CrazyCrew **/
         maven("https://repo.crazycrew.us/private") {
             name = "crazycrew"
-            //credentials(PasswordCredentials::class)
+            credentials(PasswordCredentials::class)
             credentials {
                 username = System.getenv("REPOSITORY_USERNAME")
                 password = System.getenv("REPOSITORY_PASSWORD")
