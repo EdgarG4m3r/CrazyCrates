@@ -1,5 +1,7 @@
 package me.badbones69.crazycrates.api;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import me.badbones69.crazycrates.CrazyCrates;
 import me.badbones69.crazycrates.Methods;
 import me.badbones69.crazycrates.api.objects.Crate;
@@ -8,18 +10,9 @@ import me.badbones69.crazycrates.api.objects.CrateLocation;
 import me.badbones69.crazycrates.api.objects.CrateSchematic;
 import me.badbones69.crazycrates.api.objects.ItemBuilder;
 import me.badbones69.crazycrates.api.objects.Prize;
-import me.badbones69.crazycrates.api.objects.QuadCrateSession;
 import me.badbones69.crazycrates.api.objects.Tier;
-import me.badbones69.crazycrates.controllers.CrateControl;
 import me.badbones69.crazycrates.controllers.Preview;
 import me.badbones69.crazycrates.cratetypes.CSGO;
-import me.badbones69.crazycrates.cratetypes.Cosmic;
-import me.badbones69.crazycrates.cratetypes.FireCracker;
-import me.badbones69.crazycrates.cratetypes.QuickCrate;
-import me.badbones69.crazycrates.cratetypes.Roulette;
-import me.badbones69.crazycrates.cratetypes.War;
-import me.badbones69.crazycrates.cratetypes.Wheel;
-import me.badbones69.crazycrates.cratetypes.Wonder;
 import me.badbones69.crazycrates.multisupport.holograms.DecentHologramsSupport;
 import me.badbones69.crazycrates.multisupport.holograms.HologramsSupport;
 import me.badbones69.crazycrates.multisupport.holograms.HolographicSupport;
@@ -31,8 +24,6 @@ import me.badbones69.crazycrates.api.enums.BrokeLocation;
 import me.badbones69.crazycrates.api.enums.CrateType;
 import me.badbones69.crazycrates.api.enums.KeyType;
 import me.badbones69.crazycrates.api.enums.Messages;
-import me.badbones69.crazycrates.api.events.PlayerReceiveKeyEvent;
-import me.badbones69.crazycrates.api.events.PlayerReceiveKeyEvent.KeyReciveReason;
 import me.badbones69.crazycrates.api.interfaces.HologramController;
 import me.badbones69.crazycrates.controllers.GUIMenu;
 import me.badbones69.crazycrates.multisupport.nms.v1_8_R3.NMS_v1_8_R3;
@@ -50,14 +41,23 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 import java.io.File;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 
 public class CrazyManager {
+
+    private Cache<UUID, Integer> rateLimiter = CacheBuilder.newBuilder()
+            .expireAfterWrite(5, TimeUnit.SECONDS)
+            .maximumSize(40000)
+            .build();
 
     private final CrazyCrates plugin = CrazyCrates.getPlugin();
     private final FileManager fileManager = plugin.getFileManager();
@@ -319,7 +319,6 @@ public class CrazyManager {
 
         if (fileManager.isLogging()) plugin.getLogger().info("All schematics were found and loaded.");
 
-        cleanDataFile();
         Preview.loadButtons();
     }
 
@@ -331,54 +330,6 @@ public class CrazyManager {
         return giveVirtualKeysWhenInventoryFull;
     }
 
-    /**
-     * This method is deigned to help clean the data.yml file of any unless info that it may have.
-     */
-    public void cleanDataFile() {
-        FileConfiguration data = FileManager.Files.DATA.getFile();
-
-        if (data.contains("Players")) {
-
-            if (fileManager.isLogging()) plugin.getLogger().info("Cleaning up the data.yml file.");
-
-            List<String> removePlayers = new ArrayList<>();
-
-            for (String uuid : data.getConfigurationSection("Players").getKeys(false)) {
-                boolean hasKeys = false;
-                List<String> noKeys = new ArrayList<>();
-
-                for (Crate crate : getCrates()) {
-                    if (data.getInt("Players." + uuid + "." + crate.getName()) <= 0) {
-                        noKeys.add(crate.getName());
-                    } else {
-                        hasKeys = true;
-                    }
-                }
-
-                if (hasKeys) {
-                    for (String crate : noKeys) {
-                        data.set("Players." + uuid + "." + crate, null);
-                    }
-                } else {
-                    removePlayers.add(uuid);
-                }
-            }
-
-            if (removePlayers.size() > 0) {
-                if (fileManager.isLogging()) plugin.getLogger().info(removePlayers.size() + " player's data has been marked to be removed.");
-
-                for (String uuid : removePlayers) {
-                    data.set("Players." + uuid, null);
-                }
-
-                if (fileManager.isLogging()) plugin.getLogger().info("All empty player data has been removed.");
-            }
-
-            if (fileManager.isLogging()) plugin.getLogger().info("The data.yml file has been cleaned.");
-
-            FileManager.Files.DATA.saveFile();
-        }
-    }
 
     /**
      * Opens a crate for a player.
@@ -414,82 +365,8 @@ public class CrazyManager {
             case MENU:
                 GUIMenu.openGUI(player);
                 break;
-            case COSMIC:
-                Cosmic.openCosmic(player, crate, keyType, checkHand);
-                break;
             case CSGO:
                 CSGO.openCSGO(player, crate, keyType, checkHand);
-                break;
-            case ROULETTE:
-                Roulette.openRoulette(player, crate, keyType, checkHand);
-                break;
-            case WHEEL:
-                Wheel.startWheel(player, crate, keyType, checkHand);
-                break;
-            case WONDER:
-                Wonder.startWonder(player, crate, keyType, checkHand);
-                break;
-            case WAR:
-                War.openWarCrate(player, crate, keyType, checkHand);
-                break;
-            case QUAD_CRATE:
-                Location last = player.getLocation();
-                last.setPitch(0F);
-                QuadCrateSession session = new QuadCrateSession(player, crate, keyType, location, last, checkHand);
-                broadcast = session.startCrate();
-                break;
-            case FIRE_CRACKER:
-                if (CrateControl.inUse.containsValue(location)) {
-                    player.sendMessage(Messages.QUICK_CRATE_IN_USE.getMessage());
-                    removePlayerFromOpeningList(player);
-                    return;
-                } else {
-                    if (virtualCrate) {
-                        player.sendMessage(Messages.CANT_BE_A_VIRTUAL_CRATE.getMessage());
-                        removePlayerFromOpeningList(player);
-                        return;
-                    } else {
-                        CrateControl.inUse.put(player, location);
-                        FireCracker.startFireCracker(player, crate, keyType, location);
-                    }
-                }
-                break;
-            case QUICK_CRATE:
-                if (CrateControl.inUse.containsValue(location)) {
-                    player.sendMessage(Messages.QUICK_CRATE_IN_USE.getMessage());
-                    removePlayerFromOpeningList(player);
-                    return;
-                } else {
-                    if (virtualCrate && location.equals(player.getLocation())) {
-                        player.sendMessage(Messages.CANT_BE_A_VIRTUAL_CRATE.getMessage());
-                        removePlayerFromOpeningList(player);
-                        return;
-                    } else {
-                        CrateControl.inUse.put(player, location);
-                        QuickCrate.openCrate(player, location, crate, keyType);
-                    }
-                }
-                break;
-            case CRATE_ON_THE_GO:
-                if (virtualCrate) {
-                    player.sendMessage(Messages.CANT_BE_A_VIRTUAL_CRATE.getMessage());
-                    removePlayerFromOpeningList(player);
-                    return;
-                } else {
-                    if (takeKeys(1, player, crate, keyType, true)) {
-                        Prize prize = crate.pickPrize(player);
-                        givePrize(player, prize);
-
-                        if (prize.useFireworks()) {
-                            Methods.fireWork(player.getLocation().add(0, 1, 0));
-                        }
-
-                        removePlayerFromOpeningList(player);
-                    } else {
-                        Methods.failedToTakeKey(player, crate);
-                    }
-                }
-
                 break;
         }
 
@@ -824,78 +701,6 @@ public class CrazyManager {
     }
 
     /**
-     * Give keys to an offline player.
-     * @param player The offline player you wish to give keys to.
-     * @param crate The Crate of which key you are giving to the player.
-     * @param keys The amount of keys you wish to give to the player.
-     * @return Returns true if it successfully gave the offline player a key and false if there was an error.
-     */
-    public boolean addOfflineKeys(String player, Crate crate, int keys) {
-        try {
-            FileConfiguration data = FileManager.Files.DATA.getFile();
-            player = player.toLowerCase();
-
-            if (data.contains("Offline-Players." + player + "." + crate.getName())) keys += data.getInt("Offline-Players." + player + "." + crate.getName());
-
-            data.set("Offline-Players." + player + "." + crate.getName(), keys);
-            FileManager.Files.DATA.saveFile();
-
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    /**
-     * Take keys from an offline player.
-     * @param player The player which you are taking keys from.
-     * @param crate The Crate of which key you are taking from the player.
-     * @param keys The amount of keys you wish to take.
-     * @return Returns true if it took the keys and false if an error occurred.
-     */
-    public boolean takeOfflineKeys(String player, Crate crate, int keys) {
-        try {
-            FileConfiguration data = FileManager.Files.DATA.getFile();
-            player = player.toLowerCase();
-            int playerKeys = 0;
-
-            if (data.contains("Offline-Players." + player + "." + crate.getName())) playerKeys = data.getInt("Offline-Players." + player + "." + crate.getName());
-
-            data.set("Offline-Players." + player + "." + crate.getName(), playerKeys - keys);
-            FileManager.Files.DATA.saveFile();
-
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    /**
-     * Load the offline keys of a player who has come online.
-     * @param player The player which you would like to load the offline keys for.
-     */
-    public void loadOfflinePlayersKeys(Player player) {
-        FileConfiguration data = FileManager.Files.DATA.getFile();
-        String name = player.getName().toLowerCase();
-
-        if (data.contains("Offline-Players." + name)) {
-            for (Crate crate : getCrates()) {
-                if (data.contains("Offline-Players." + name + "." + crate.getName())) {
-                    PlayerReceiveKeyEvent event = new PlayerReceiveKeyEvent(player, crate, KeyReciveReason.OFFLINE_PLAYER, 1);
-                    plugin.getServer().getPluginManager().callEvent(event);
-
-                    if (!event.isCancelled()) addKeys(data.getInt("Offline-Players." + name + "." + crate.getName()), player, crate, KeyType.VIRTUAL_KEY);
-                }
-            }
-
-            data.set("Offline-Players." + name, null);
-            FileManager.Files.DATA.saveFile();
-        }
-    }
-
-    /**
      * Add a player to the list of players that are currently opening crates.
      * @param player The player that is opening a crate.
      * @param crate The crate the player is opening.
@@ -1129,95 +934,21 @@ public class CrazyManager {
      * @param amount The amount of keys you wish to take.
      * @param player The player you wish to take keys from.
      * @param crate The crate key you are taking.
-     * @param keyType The type of key you are taking from the player.
-     * @param checkHand If it just checks the players hand or if it checks their inventory.
      * @return Returns true if successfully taken keys and false if not.
      */
-    public boolean takeKeys(int amount, Player player, Crate crate, KeyType keyType, boolean checkHand) {
-        switch (keyType) {
-            case PHYSICAL_KEY:
-                int takeAmount = amount;
-                boolean hasOffhand = ServerProtocol.isAtLeast(ServerProtocol.v1_9_R1);
-
-                try {
-                    List<ItemStack> items = new ArrayList<>();
-
-                    if (checkHand) {
-                        items.add(nmsSupport.getItemInMainHand(player));
-
-                        if (hasOffhand) items.add(player.getEquipment().getItemInOffHand());
-                    } else {
-                        items.addAll(Arrays.asList(player.getInventory().getContents()));
-
-                        if (hasOffhand) items.remove(player.getEquipment().getItemInOffHand());
-                    }
-
-                    for (ItemStack item : items) {
-                        if (item != null) {
-                            if (isKeyFromCrate(item, crate)) {
-                                int keyAmount = item.getAmount();
-
-                                if ((takeAmount - keyAmount) >= 0) {
-                                    Methods.removeItemAnySlot(player.getInventory(), item);
-                                    takeAmount -= keyAmount;
-                                } else {
-                                    item.setAmount(keyAmount - takeAmount);
-                                    takeAmount = 0;
-                                }
-
-                                if (takeAmount <= 0) return true;
-                            }
-                        }
-                    }
-
-                    // This needs to be done as player.getInventory().removeItem(ItemStack); does NOT remove from the offhand.
-                    if (takeAmount > 0 && hasOffhand) {
-                        ItemStack item = player.getEquipment().getItemInOffHand();
-
-                        if (item != null) {
-                            if (isKeyFromCrate(item, crate)) {
-                                int keyAmount = item.getAmount();
-
-                                if ((takeAmount - keyAmount) >= 0) {
-                                    player.getEquipment().setItemInOffHand(new ItemStack(Material.AIR, 1));
-                                    takeAmount -= keyAmount;
-                                } else {
-                                    item.setAmount(keyAmount - takeAmount);
-                                    takeAmount = 0;
-                                }
-
-                                if (takeAmount <= 0) return true;
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    Methods.failedToTakeKey(player, crate, e);
-                    return false;
-                }
-
-                // Returns true because it was able to take some keys.
-                if (takeAmount < amount) return true;
-
-                break;
-            case VIRTUAL_KEY:
-                String uuid = player.getUniqueId().toString();
-                int keys = getVirtualKeys(player, crate);
-                FileManager.Files.DATA.getFile().set("Players." + uuid + ".Name", player.getName());
-                int newAmount = Math.max((keys - amount), 0);
-
-                if (newAmount == 0) {
-                    FileManager.Files.DATA.getFile().set("Players." + uuid + "." + crate.getName(), null);
-                } else {
-                    FileManager.Files.DATA.getFile().set("Players." + uuid + "." + crate.getName(), newAmount);
-                }
-
-                FileManager.Files.DATA.saveFile();
-                return true;
-            case FREE_KEY: // Returns true because it's FREE
-                return true;
+    public boolean takeKeys(int amount, Player player, Crate crate) {
+        String uuid = player.getUniqueId().toString();
+        String SQL = "CALL `takeKeys`(?, ?, ?);";
+        try (Connection connection = plugin.getDatabase().getConnection(); PreparedStatement statement = connection.prepareStatement(SQL)) {
+            statement.setString(1, uuid);
+            statement.setString(2, crate.getName());
+            statement.setInt(3, amount);
+            statement.executeQuery();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
         }
-
-        return false;
+        return true;
     }
 
     /**
@@ -1225,29 +956,19 @@ public class CrazyManager {
      * @param amount The amount of keys you are giving them.
      * @param player The player you want to give the keys to.
      * @param crate The Crate of whose keys you are giving.
-     * @param keyType The type of key you are giving to the player.
      */
-    public void addKeys(int amount, Player player, Crate crate, KeyType keyType) {
-        switch (keyType) {
-            case PHYSICAL_KEY:
-                if (Methods.isInventoryFull(player)) {
-                    if (giveVirtualKeysWhenInventoryFull && crate.getCrateType() != CrateType.CRATE_ON_THE_GO) {
-                        addKeys(amount, player, crate, KeyType.VIRTUAL_KEY);
-                    } else {
-                        player.getWorld().dropItem(player.getLocation(), crate.getKey(amount));
-                    }
-                } else {
-                    player.getInventory().addItem(crate.getKey(amount));
-                }
-
-                break;
-            case VIRTUAL_KEY:
-                String uuid = player.getUniqueId().toString();
-                int keys = getVirtualKeys(player, crate);
-                FileManager.Files.DATA.getFile().set("Players." + uuid + ".Name", player.getName());
-                FileManager.Files.DATA.getFile().set("Players." + uuid + "." + crate.getName(), (Math.max((keys + amount), 0)));
-                FileManager.Files.DATA.saveFile();
-                break;
+    public void addKeys(int amount, Player player, Crate crate) {
+        String uuid = player.getUniqueId().toString();
+        String SQL = "CALL `giveKeys`(?, ?, ?);";
+        try(Connection connection = plugin.getDatabase().getConnection(); PreparedStatement statement = connection.prepareStatement(SQL))
+        {
+            statement.setString(1, uuid);
+            statement.setString(2, crate.getName());
+            statement.setInt(3, amount);
+            statement.executeQuery();
+        } catch (SQLException e)
+        {
+            e.printStackTrace();
         }
     }
 
@@ -1259,27 +980,18 @@ public class CrazyManager {
      */
     public void setKeys(int amount, Player player, Crate crate) {
         String uuid = player.getUniqueId().toString();
-        FileManager.Files.DATA.getFile().set("Players." + uuid + ".Name", player.getName());
-        FileManager.Files.DATA.getFile().set("Players." + uuid + "." + crate.getName(), amount);
-        FileManager.Files.DATA.saveFile();
-    }
-
-    /**
-     * Set a new player's default amount of keys.
-     * @param player The player that has just joined.
-     */
-    public void setNewPlayerKeys(Player player) {
-        if (giveNewPlayersKeys) { // Checks if any crate gives new players keys and if not then no need to do all this stuff.
-            String uuid = player.getUniqueId().toString();
-
-            if (!player.hasPlayedBefore()) {
-                crates.stream()
-                .filter(Crate :: doNewPlayersGetKeys)
-                .forEach(crate -> FileManager.Files.DATA.getFile().set("Player." + uuid + "." + crate, crate.getNewPlayerKeys()));
-            }
+        String SQL = "CALL `setKeys`(?, ?, ?);";
+        try(Connection connection = plugin.getDatabase().getConnection(); PreparedStatement statement = connection.prepareStatement(SQL))
+        {
+            statement.setString(1, uuid);
+            statement.setString(2, crate.getName());
+            statement.setInt(3, amount);
+            statement.executeQuery();
+        } catch (SQLException e)
+        {
+            e.printStackTrace();
         }
     }
-
     /**
      * Get the NMS version being used.
      * @return Version of NMS, returns null if not found.

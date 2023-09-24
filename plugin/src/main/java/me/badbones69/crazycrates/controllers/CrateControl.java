@@ -10,8 +10,8 @@ import me.badbones69.crazycrates.api.enums.Messages;
 import me.badbones69.crazycrates.api.events.PhysicalCrateKeyCheckEvent;
 import me.badbones69.crazycrates.api.objects.Crate;
 import me.badbones69.crazycrates.api.objects.CrateLocation;
-import me.badbones69.crazycrates.cratetypes.QuickCrate;
 import me.badbones69.crazycrates.multisupport.ServerProtocol;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -160,8 +160,6 @@ public class CrateControl implements Listener { // Crate Control
                             return;
                         }
 
-                        if (useQuickCrateAgain) QuickCrate.endQuickCrate(player, crateLocation.getLocation());
-
                         KeyType keyType = isPhysical ? KeyType.PHYSICAL_KEY : KeyType.VIRTUAL_KEY;
                         if (crate.getCrateType() == CrateType.COSMIC) crazyManager.addPlayerKeyType(player, keyType);
 
@@ -205,7 +203,9 @@ public class CrateControl implements Listener { // Crate Control
                     if (e.getAction() == InventoryAction.PICKUP_ALL) {
                         player.getInventory().addItem(crate.getKey());
                     } else if (e.getAction() == InventoryAction.PICKUP_HALF) {
-                        crazyManager.addKeys(1, player, crate, KeyType.VIRTUAL_KEY);
+                        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                            crazyManager.addKeys(1, player, crate);
+                        });
                         String name = null;
                         ItemStack key = crate.getKey();
 

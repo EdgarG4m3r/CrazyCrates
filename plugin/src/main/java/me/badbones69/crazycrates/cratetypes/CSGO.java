@@ -8,6 +8,7 @@ import me.badbones69.crazycrates.api.events.PlayerPrizeEvent;
 import me.badbones69.crazycrates.api.objects.Crate;
 import me.badbones69.crazycrates.api.objects.ItemBuilder;
 import me.badbones69.crazycrates.api.objects.Prize;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
@@ -72,12 +73,18 @@ public class CSGO implements Listener {
 
         player.openInventory(inv);
 
-        if (crazyManager.takeKeys(1, player, crate, keyType, checkHand)) {
-            startCSGO(player, inv, crate);
-        } else {
-            Methods.failedToTakeKey(player, crate);
-            crazyManager.removePlayerFromOpeningList(player);
-        }
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            if (crazyManager.takeKeys(1, player, crate)) {
+                Bukkit.getScheduler().runTask(plugin, () -> {
+                    startCSGO(player, inv, crate);
+                });
+            } else {
+                Bukkit.getScheduler().runTask(plugin, () -> {
+                    Methods.failedToTakeKey(player, crate);
+                    crazyManager.removePlayerFromOpeningList(player);
+                });
+            }
+        });
     }
     
     private static void startCSGO(final Player player, final Inventory inv, Crate crate) {

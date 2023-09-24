@@ -4,25 +4,15 @@ import me.badbones69.crazycrates.api.enums.Messages;
 import me.badbones69.crazycrates.api.CrazyManager;
 import me.badbones69.crazycrates.api.FileManager;
 import me.badbones69.crazycrates.api.FileManager.Files;
-import me.badbones69.crazycrates.api.objects.QuadCrateSession;
 import me.badbones69.crazycrates.commands.CCCommand;
 import me.badbones69.crazycrates.commands.CCTab;
 import me.badbones69.crazycrates.commands.KeyCommand;
 import me.badbones69.crazycrates.commands.KeyTab;
 import me.badbones69.crazycrates.controllers.BrokeLocationsControl;
-import me.badbones69.crazycrates.controllers.CrateControl;
 import me.badbones69.crazycrates.controllers.FireworkDamageEvent;
 import me.badbones69.crazycrates.controllers.GUIMenu;
 import me.badbones69.crazycrates.controllers.Preview;
 import me.badbones69.crazycrates.cratetypes.CSGO;
-import me.badbones69.crazycrates.cratetypes.Cosmic;
-import me.badbones69.crazycrates.cratetypes.CrateOnTheGo;
-import me.badbones69.crazycrates.cratetypes.QuadCrate;
-import me.badbones69.crazycrates.cratetypes.QuickCrate;
-import me.badbones69.crazycrates.cratetypes.Roulette;
-import me.badbones69.crazycrates.cratetypes.War;
-import me.badbones69.crazycrates.cratetypes.Wheel;
-import me.badbones69.crazycrates.cratetypes.Wonder;
 import me.badbones69.crazycrates.database.MySQL;
 import me.badbones69.crazycrates.multisupport.Events_v1_11_R1_Down;
 import me.badbones69.crazycrates.multisupport.Events_v1_12_R1_Up;
@@ -105,16 +95,7 @@ public class CrazyCrates extends JavaPlugin implements Listener {
         pluginManager.registerEvents(this, this);
         pluginManager.registerEvents(new GUIMenu(), this);
         pluginManager.registerEvents(new Preview(), this);
-        pluginManager.registerEvents(new QuadCrate(), this);
-        pluginManager.registerEvents(new War(), this);
         pluginManager.registerEvents(new CSGO(), this);
-        pluginManager.registerEvents(new Wheel(), this);
-        pluginManager.registerEvents(new Wonder(), this);
-        pluginManager.registerEvents(new Cosmic(), this);
-        pluginManager.registerEvents(new Roulette(), this);
-        pluginManager.registerEvents(new QuickCrate(), this);
-        pluginManager.registerEvents(new CrateControl(), this);
-        pluginManager.registerEvents(new CrateOnTheGo(), this);
 
         if (ServerProtocol.isAtLeast(ServerProtocol.v1_12_R1)) pluginManager.registerEvents(new Events_v1_12_R1_Up(), this); else pluginManager.registerEvents(new Events_v1_11_R1_Down(), this);
 
@@ -164,18 +145,8 @@ public class CrazyCrates extends JavaPlugin implements Listener {
     @Override
     public void onDisable() {
         if (isEnabled) {
-            QuadCrateSession.endAllCrates();
-            QuickCrate.removeAllRewards();
-
             if (crazyManager.getHologramController() != null) crazyManager.getHologramController().removeAllHolograms();
         }
-    }
-    
-    @EventHandler
-    public void onJoin(PlayerJoinEvent e) {
-        Player player = e.getPlayer();
-        crazyManager.setNewPlayerKeys(player);
-        crazyManager.loadOfflinePlayersKeys(player);
     }
 
     public static CrazyCrates getPlugin() {

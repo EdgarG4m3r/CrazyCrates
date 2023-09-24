@@ -15,10 +15,7 @@ import me.badbones69.crazycrates.controllers.CrateControl;
 import me.badbones69.crazycrates.controllers.Preview;
 import me.badbones69.crazycrates.multisupport.ServerProtocol;
 import me.badbones69.crazycrates.controllers.GUIMenu;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -532,8 +529,11 @@ public class CCCommand implements CommandExecutor {
                                     plugin.getServer().getPluginManager().callEvent(event);
 
                                     if (!event.isCancelled()) {
-                                        crazyManager.takeKeys(amount, player, crate, KeyType.VIRTUAL_KEY, false);
-                                        crazyManager.addKeys(amount, target, crate, KeyType.VIRTUAL_KEY);
+                                        int finalAmount = amount;
+                                        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                                            crazyManager.takeKeys(finalAmount, player, crate);
+                                            crazyManager.addKeys(finalAmount, target, crate);
+                                        });
                                         HashMap<String, String> placeholders = new HashMap<>();
                                         placeholders.put("%Crate%", crate.getName());
                                         placeholders.put("%Amount%", amount + "");
@@ -601,7 +601,8 @@ public class CCCommand implements CommandExecutor {
                                         return true;
                                     }
 
-                                    crazyManager.addKeys(amount, player, crate, type);
+                                    int finalAmount = amount;
+                                    Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> crazyManager.addKeys(finalAmount, player, crate));
                                 }
                             }
 
@@ -669,18 +670,10 @@ public class CCCommand implements CommandExecutor {
                                 target.getInventory().addItem(crate.getKey(amount));
                             } else {
                                 if (target != null) {
-                                    crazyManager.addKeys(amount, target, crate, type);
+                                    crazyManager.addKeys(amount, target, crate);
                                 } else {
-                                    if (!crazyManager.addOfflineKeys(args[4], crate, amount)) {
-                                        sender.sendMessage(Messages.INTERNAL_ERROR.getMessage());
-                                    } else {
-                                        HashMap<String, String> placeholders = new HashMap<>();
-                                        placeholders.put("%Amount%", amount + "");
-                                        placeholders.put("%Player%", args[4]);
-                                        sender.sendMessage(Messages.GIVEN_OFFLINE_PLAYER_KEYS.getMessage(placeholders));
-                                    }
-
-                                    return true;
+                                    sender.sendMessage("We couldn't find that player.");
+                                    return false;
                                 }
                             }
 
@@ -727,7 +720,11 @@ public class CCCommand implements CommandExecutor {
                             placeholders.put("%Player%", sender.getName());
                             sender.sendMessage(Messages.TAKE_A_PLAYER_KEYS.getMessage(placeholders));
 
-                            if (!crazyManager.takeKeys(1, (Player) sender, crate, keyType, false)) Methods.failedToTakeKey((Player) sender, crate);
+                            //if (!crazyManager.takeKeys(1, (Player) sender, crate, keyType, false)) Methods.failedToTakeKey((Player) sender, crate);
+                            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                                boolean took = crazyManager.takeKeys(1, (Player) sender, crate);
+                                if (!took) Bukkit.getScheduler().runTask(plugin, () -> Methods.failedToTakeKey((Player) sender, crate));
+                            });
 
                             return true;
                         }
@@ -755,7 +752,10 @@ public class CCCommand implements CommandExecutor {
                             placeholders.put("%Player%", sender.getName());
                             sender.sendMessage(Messages.TAKE_A_PLAYER_KEYS.getMessage(placeholders));
 
-                            if (!crazyManager.takeKeys(amount, (Player) sender, crate, keyType, false)) Methods.failedToTakeKey((Player) sender, crate);
+                            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                               boolean took = crazyManager.takeKeys(amount, (Player) sender, crate);
+                               if (!took) Bukkit.getScheduler().runTask(plugin, () -> Methods.failedToTakeKey((Player) sender, crate));
+                            });
 
                             return true;
                         }
@@ -781,17 +781,14 @@ public class CCCommand implements CommandExecutor {
                                     placeholders.put("%Player%", target.getName());
                                     sender.sendMessage(Messages.TAKE_A_PLAYER_KEYS.getMessage(placeholders));
 
-                                    if (!crazyManager.takeKeys(amount, target, crate, KeyType.VIRTUAL_KEY, false)) Methods.failedToTakeKey((Player) sender, crate);
+                                    //if (!crazyManager.takeKeys(amount, target, crate, KeyType.VIRTUAL_KEY, false)) Methods.failedToTakeKey((Player) sender, crate);
+                                    Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                                        boolean took = crazyManager.takeKeys(amount, target, crate);
+                                        if (!took) Bukkit.getScheduler().runTask(plugin, () -> Methods.failedToTakeKey((Player) sender, crate));
+                                    });
                                 } else {
-                                    if (!crazyManager.takeOfflineKeys(args[4], crate, amount)) {
-                                        sender.sendMessage(Messages.INTERNAL_ERROR.getMessage());
-                                    } else {
-                                        HashMap<String, String> placeholders = new HashMap<>();
-                                        placeholders.put("%Amount%", amount + "");
-                                        placeholders.put("%Player%", args[4]);
-                                        sender.sendMessage(Messages.TAKE_OFFLINE_PLAYER_KEYS.getMessage(placeholders));
-                                    }
-                                    return true;
+                                    sender.sendMessage("We dont support offline players yet.");
+                                    return false;
                                 }
                             } else if (keyType == KeyType.PHYSICAL_KEY) {
                                 if (target != null) {
@@ -800,7 +797,11 @@ public class CCCommand implements CommandExecutor {
                                     placeholders.put("%Player%", target.getName());
                                     sender.sendMessage(Messages.TAKE_A_PLAYER_KEYS.getMessage(placeholders));
 
-                                    if (!crazyManager.takeKeys(amount, target, crate, KeyType.PHYSICAL_KEY, false)) Methods.failedToTakeKey((Player) sender, crate);
+                                    //if (!crazyManager.takeKeys(amount, target, crate, KeyType.PHYSICAL_KEY, false)) Methods.failedToTakeKey((Player) sender, crate);
+                                    Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                                        boolean took = crazyManager.takeKeys(amount, target, crate);
+                                        if (!took) Bukkit.getScheduler().runTask(plugin, () -> Methods.failedToTakeKey((Player) sender, crate));
+                                    });
                                 } else {
                                     sender.sendMessage(Messages.NOT_ONLINE.getMessage("%Player%", args[4]));
                                 }
