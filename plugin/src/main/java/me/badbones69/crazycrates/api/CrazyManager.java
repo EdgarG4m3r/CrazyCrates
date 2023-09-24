@@ -26,8 +26,6 @@ import me.badbones69.crazycrates.multisupport.holograms.HolographicSupport;
 import me.badbones69.crazycrates.multisupport.ServerProtocol;
 import me.badbones69.crazycrates.multisupport.Support;
 import me.badbones69.crazycrates.multisupport.nms.NMSSupport;
-import me.badbones69.crazycrates.multisupport.nms.v1_12_R1.NMS_v1_12_R1;
-import me.badbones69.crazycrates.multisupport.nms.v1_16_R3.NMS_v1_16_R3;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import me.badbones69.crazycrates.api.enums.BrokeLocation;
 import me.badbones69.crazycrates.api.enums.CrateType;
@@ -50,7 +48,6 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import java.io.File;
 import java.util.ArrayList;
@@ -162,21 +159,7 @@ public class CrazyManager {
         useNewMaterial = ServerProtocol.isNewer(ServerProtocol.v1_12_R1);
         useNewSounds = ServerProtocol.isAtLeast(ServerProtocol.v1_9_R1);
 
-        switch (version) {
-            case v1_8_R1:
-            case v1_8_R2:
-            case v1_8_R3:
-                nmsSupport = new NMS_v1_8_R3();
-                break;
-            case v1_12_R1:
-                nmsSupport = new NMS_v1_12_R1();
-                break;
-            case v1_16_R1:
-            case v1_16_R2:
-            case v1_16_R3:
-                nmsSupport = new NMS_v1_16_R3();
-                break;
-        }
+        nmsSupport = new NMS_v1_8_R3();
 
         quadCrateTimer = FileManager.Files.CONFIG.getFile().getInt("Settings.QuadCrate.Timer") * 20;
         giveVirtualKeysWhenInventoryFull = FileManager.Files.CONFIG.getFile().getBoolean("Settings.Give-Virtual-Keys-When-Inventory-Full");

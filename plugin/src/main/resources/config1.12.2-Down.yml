@@ -12,6 +12,14 @@ Settings:
     Timer: 300
   DisabledWorlds:
     - 'world_nether'
+  MySQL:
+    Address: 'localhost'
+    Port: '3306'
+    Database: 'CrazyCrates'
+    Username: 'root'
+    Password: 'password'
+    Table: 'BedWars_Crates'
+    UseSSL: false
   Preview:
     Buttons:
       Menu:

@@ -23,6 +23,7 @@ import me.badbones69.crazycrates.cratetypes.Roulette;
 import me.badbones69.crazycrates.cratetypes.War;
 import me.badbones69.crazycrates.cratetypes.Wheel;
 import me.badbones69.crazycrates.cratetypes.Wonder;
+import me.badbones69.crazycrates.database.MySQL;
 import me.badbones69.crazycrates.multisupport.Events_v1_11_R1_Down;
 import me.badbones69.crazycrates.multisupport.Events_v1_12_R1_Up;
 import me.badbones69.crazycrates.multisupport.ServerProtocol;
@@ -50,6 +51,8 @@ public class CrazyCrates extends JavaPlugin implements Listener {
     private FileManager fileManager;
 
     private CrazyManager crazyManager;
+    private MySQL database;
+
     
     @Override
     public void onEnable() {
@@ -93,11 +96,6 @@ public class CrazyCrates extends JavaPlugin implements Listener {
             Files.LOCATIONS.saveFile();
         }
 
-        if (!Files.DATA.getFile().contains("Players")) {
-            Files.DATA.getFile().set("Players.Clear", null);
-            Files.DATA.saveFile();
-        }
-
         Messages.addMissingMessages();
 
         crazyManager.loadCrates();
@@ -138,6 +136,16 @@ public class CrazyCrates extends JavaPlugin implements Listener {
 
             Files.CONFIG.saveFile();
         }
+
+        this.database = new MySQL(
+                config.getString("MySQL.Address"),
+                config.getString("MySQL.Port"),
+                config.getString("MySQL.Database"),
+                config.getString("MySQL.Username"),
+                config.getString("MySQL.Password"),
+                config.getBoolean("MySQL.UseSSL")
+        );
+        this.database.connect();
 
         if (metricsEnabled) new Metrics(this, 4514);
 
@@ -180,5 +188,9 @@ public class CrazyCrates extends JavaPlugin implements Listener {
 
     public CrazyManager getCrazyManager() {
         return crazyManager;
+    }
+
+    public MySQL getDatabase() {
+        return database;
     }
 }

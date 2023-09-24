@@ -26,8 +26,6 @@ dependencies {
     implementation(project(":api"))
 
     implementation(project(":v1_8_R3"))
-    implementation(project(":v1_12_R1"))
-    implementation(project(":v1_16_R3"))
 
     implementation("de.tr7zw", "nbt-data-api", "2.11.1")
 
@@ -53,6 +51,8 @@ dependencies {
         exclude(group = "org.spigotmc")
         exclude(group = "org.bukkit")
     }
+
+    compileOnly("com.zaxxer", "HikariCP", "3.4.5")
 }
 
 tasks {
@@ -81,16 +81,9 @@ tasks {
 
         autoAddDependsOn.set(true)
 
-        gameVersions.addAll(listOf("1.8.8", "1.12.2", "1.16.5"))
+        gameVersions.addAll(listOf("1.8.8"))
         loaders.addAll(listOf("spigot", "paper"))
 
-        //<h3>The first release for CrazyCrates on Modrinth! 🎉🎉🎉🎉🎉<h3><br> If we want a header.
-        changelog.set("""
-                <h4>Notice:</h4>
-                 <p>This is only for Legacy ( 1.8 - 1.16.5 ) Support, No new features will be added.</p>
-                <h4>Bug Fixes:</h4>
-                 <p>Downgraded holographic displays support to 2.4.9 because 3.0.0 is garbage</p>
-            """.trimIndent())
     }
 
     processResources {

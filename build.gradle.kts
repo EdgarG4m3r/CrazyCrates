@@ -2,6 +2,8 @@ plugins {
     `java-library`
 }
 
+configurations { create("externalLibs") }
+
 allprojects {
     apply(plugin = "java-library")
 
@@ -9,16 +11,8 @@ allprojects {
         maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
 
         maven("https://jitpack.io")
-
-        /** CrazyCrew **/
-        maven("https://repo.crazycrew.us/private") {
-            name = "crazycrew"
-            credentials(PasswordCredentials::class)
-            credentials {
-                username = System.getenv("REPOSITORY_USERNAME")
-                password = System.getenv("REPOSITORY_PASSWORD")
-            }
-        }
+        maven("https://repo.papermc.io/repository/maven-public/")
+        maven("https://oss.sonatype.org/content/groups/public/")
 
         /**
          * Everything else we need.
